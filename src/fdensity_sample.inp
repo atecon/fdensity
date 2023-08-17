@@ -35,4 +35,15 @@ elif EXAMPLE == 4
     opts = defbundle("scale", 0.8, "control", 1, "title", my_title)
     b = fdensity(x, d, opts)
     print "a plot should have appeared"
+elif EXAMPLE == 5
+    # same as example 1, with different options
+    set seed 12041996
+    nulldata 8192
+    d = uniform() < 0.4
+    x = d ? normal() : 3 + normal()/2
+    my_title = "Smaller bandwidth, Epanechnikov kernel but optimal bandwidth selection"
+    opts = _(scale = -1, control = 1, bw_method = "silverman",
+             title = my_title)
+    b = fdensity(x, d, opts)
+    print "a plot should have appeared"
 endif
