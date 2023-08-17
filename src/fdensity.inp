@@ -26,19 +26,13 @@ end function
 
 function matrices fkd (const series x,
                        const series d,
-                       string xname,
-                       string dname,
-                       scalar scale,
-                       scalar control)
+                       bundle opts)
     v = values(d)
     nv = rows(v)
     matrix f = {}
     matrix kept = {}
 
-    MINOBS = 30
-    MAXVAL = 12
-
-    if nv>MAXVAL
+    if nv > opts.MAXVAL
         printf "Too many values for factor (%d, max. 12)\n", nv
         return defarray(f, kept)
     endif
@@ -51,9 +45,21 @@ function matrices fkd (const series x,
         di = v[i]
         series tmp = d == di ? x : NA
         nn = nobs(tmp)
-        if nn >= MINOBS
+
+        if nn >= opts.MINOBS
             kept ~= i
-            matrix kd = kdensity(tmp, scale, control)
+
+            # TODO: We may want to store the optimal bandwidths
+            if opts.scale == -1
+                scalar scale = optimal_bandwidth (tmp, opts)
+            else
+                scalar scale = opts.scale
+            endif
+            print opts
+            print scale
+
+            matrix kd = kdensity(tmp, scale, opts.control)
+
             n = rows(kd)
             X |= kd[,1]
             Yi = mshape(NA, n, nv)
@@ -77,7 +83,6 @@ function matrices fkd (const series x,
         endloop
 
         # set up the column names
-
         f = Z ~ X
         strs = strvals(d, 1)
         if nelem(strs)
@@ -86,22 +91,48 @@ function matrices fkd (const series x,
             matrix v = values(d)
             strings clabels = array(nk)
             loop i = 1 .. nk
-                clabels[i] = sprintf("%s = %d", dname, v[kept[i]])
+                clabels[i] = sprintf("%s = %d", opts.dname, v[kept[i]])
             endloop
         endif
-        clabels = clabels + defarray(xname)
+        clabels = clabels + defarray(opts.xname)
         cnameset(f, clabels)
         ret = defarray(f, kept)
     endif
     return ret
 end function
 
+
+function scalar optimal_bandwidth (const series y,
+                                   const bundle opts)
+    /* Compute the optimal bandwidth using the KdeBandwidth package.
+    return: scalar, optimal bandwidth */
+
+    scalar bw = kde_bandwidth({y},
+                              opts.bw_method,
+                              opts.bw_df,
+                              opts.bw_skip_na,
+                              opts.bw_verbose)
+
+    return bw
+end function
+
+
 function bundle fkd_defopts (void)
-    bundle ret = _(scale=1, control=0, dest="display", title="")
+    /* Bundle holding default values. */
+
+    bundle ret = _(scale = 1,
+                   control = 0,
+                   dest = "display",
+                   title = "",
+                   MINOBS = 30,
+                   MAXVAL = 12,
+                   bw_method = "silverman",
+                   bw_skip_na = TRUE,
+                   bw_df = TRUE,
+                   bw_verbose = FALSE)
     return ret
 end function
 
-# public functions
 
 function bundle fdensity (const series x,
                           const series d,
@@ -111,23 +142,24 @@ function bundle fdensity (const series x,
         opts = opts_in + opts
     endif
 
-    xname = argname(x)
-    if strlen(xname) == 0
-        xname = "(anonymous)"
+    opts.xname = argname(x)
+    if strlen(opts.xname) == 0
+        opts.xname = "(anonymous)"
     endif
 
-    dname = argname(d)
-    if strlen(dname) == 0
-        dname = "(anonymous)"
+    opts.dname = argname(d)
+    if strlen(opts.dname) == 0
+        opts.dname = "(anonymous)"
     endif
 
     if strlen(opts.title)
-        title = opts.title
+        opts.title = opts.title
     else
-        title = sprintf("Kernel density of %s by %s", xname, dname)
+        opts.title = sprintf("Kernel density of %s by %s",
+                             opts.xname, opts.dname)
     endif
 
-    matrices f_k = fkd(x, d, xname, dname, opts.scale, opts.control)
+    matrices f_k = fkd(x, d, opts)
     kept = f_k[2]
     bundle ret = opts
     ret.err = 0
@@ -145,7 +177,7 @@ function bundle fdensity (const series x,
     dest = opts.dest
     plot f
         option with-lines
-        printf "set title \"%s\"", title
+        printf "set title \"%s\"", opts.title
     end plot --output="@dest"
 
     return ret
