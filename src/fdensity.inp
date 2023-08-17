@@ -55,8 +55,6 @@ function matrices fkd (const series x,
             else
                 scalar scale = opts.scale
             endif
-            print opts
-            print scale
 
             matrix kd = kdensity(tmp, scale, opts.control)
 
