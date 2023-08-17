@@ -1,0 +1,38 @@
+set verbose off
+include fdensity.gfn
+
+EXAMPLE = 1
+
+if EXAMPLE == 1
+    # artificial, with dummy factor
+    set seed 12041996
+    nulldata 8192
+    d = uniform() < 0.4
+    x = d ? normal() : 3 + normal()/2
+    freq x --silent --plot=display
+    boxplot x d --factorized --output=display	
+    b = fdensity(x, d)
+    print "three plots should have appeared"
+elif EXAMPLE == 2
+    # discrete numerical factor
+    open keane.gdt --quiet
+    fdensity(lwage, choice)
+    print "a plot should have appeared"
+elif EXAMPLE == 3
+    # same as above, with string-valued factor
+    open keane.gdt --quiet
+    series str_ch = choice
+    stringify(str_ch, strsplit("sch home wc bc serv"))
+    fdensity(lwage, str_ch)
+    print "a plot should have appeared"
+elif EXAMPLE == 4
+    # same as example 1, with different options
+    set seed 12041996
+    nulldata 8192
+    d = uniform() < 0.4
+    x = d ? normal() : 3 + normal()/2
+    my_title = "Smaller bandwidth, Epanechnikov kernel"
+    opts = defbundle("scale", 0.8, "control", 1, "title", my_title)
+    b = fdensity(x, d, opts)
+    print "a plot should have appeared"
+endif

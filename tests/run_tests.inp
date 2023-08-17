@@ -1,0 +1,17 @@
+set verbose off
+clear
+
+include assertion.gfn
+set assert stop
+
+include "./src/fdensity.inp" --force
+
+
+
+
+
+
+print "Successfully passed all tests."
+quit
+
+

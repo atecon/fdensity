@@ -1,0 +1,188 @@
+function matrix fill (const matrix f,
+                      const matrix xcoord)
+    n = rows(f)
+    valid = selifr(seq(1,n)', ok(f))
+    nv = rows(valid)
+
+    if nv < 2
+        return {}
+    endif
+
+    to_fill = diff(valid)[2:] .> 1
+    fills = selifr(valid[1:nv-1] ~ valid[2:nv], to_fill)
+    ret = f
+    nf = rows(fills)
+    loop i = 1 .. nf
+        lo = fills[i,1]
+        hi = fills[i,2]
+        xlo = xcoord[lo]
+        xhi = xcoord[hi]
+        d = (f[hi] - f[lo]) / (xhi - xlo)
+        v = f[lo] + (xcoord[lo+1:hi-1] - xlo) * d
+        ret[lo+1:hi-1] = v'
+    endloop
+    return ret
+end function
+
+function matrices fkd (const series x,
+                       const series d,
+                       string xname,
+                       string dname,
+                       scalar scale,
+                       scalar control)
+    v = values(d)
+    nv = rows(v)
+    matrix f = {}
+    matrix kept = {}
+
+    MINOBS = 30
+    MAXVAL = 12
+
+    if nv>MAXVAL
+        printf "Too many values for factor (%d, max. 12)\n", nv
+        return defarray(f, kept)
+    endif
+
+    matrices ret = array(2)
+    matrix X = {}
+    matrix Y = {}
+
+    loop i = 1 .. nv
+        di = v[i]
+        series tmp = d == di ? x : NA
+        nn = nobs(tmp)
+        if nn >= MINOBS
+            kept ~= i
+            matrix kd = kdensity(tmp, scale, control)
+            n = rows(kd)
+            X |= kd[,1]
+            Yi = mshape(NA, n, nv)
+            Yi[,i] = kd[,2]
+            Y |= Yi
+        endif
+    endloop
+    nk = nelem(kept)
+
+    if nk > 0
+        # fill up the NAs
+        scalar n = rows(X)
+        X = msortby(seq(1, n)' ~ X, 2)
+        ndx = X[,1]
+        X = X[,2]
+        Z = mshape(NA, n, nk)
+
+        loop i = 1 .. nk
+            j = kept[i]
+            Z[,i] = fill(Y[ndx,j], X)
+        endloop
+
+        # set up the column names
+
+        f = Z ~ X
+        strs = strvals(d, 1)
+        if nelem(strs)
+            strings clabels = strs[kept]
+        else
+            matrix v = values(d)
+            strings clabels = array(nk)
+            loop i = 1 .. nk
+                clabels[i] = sprintf("%s = %d", dname, v[kept[i]])
+            endloop
+        endif
+        clabels = clabels + defarray(xname)
+        cnameset(f, clabels)
+        ret = defarray(f, kept)
+    endif
+    return ret
+end function
+
+function bundle fkd_defopts (void)
+    bundle ret = _(scale=1, control=0, dest="display", title="")
+    return ret
+end function
+
+# public functions
+
+function bundle fdensity (const series x,
+                          const series d,
+                          bundle opts_in[null])
+    bundle opts = fkd_defopts()
+    if exists(opts_in)
+        opts = opts_in + opts
+    endif
+
+    xname = argname(x)
+    if strlen(xname) == 0
+        xname = "(anonymous)"
+    endif
+
+    dname = argname(d)
+    if strlen(dname) == 0
+        dname = "(anonymous)"
+    endif
+
+    if strlen(opts.title)
+        title = opts.title
+    else
+        title = sprintf("Kernel density of %s by %s", xname, dname)
+    endif
+
+    matrices f_k = fkd(x, d, xname, dname, opts.scale, opts.control)
+    kept = f_k[2]
+    bundle ret = opts
+    ret.err = 0
+
+    if nelem(kept) == 0
+        fprintf "Invalid conditioning\n"
+        ret.err = 1
+        return ret
+    endif
+
+    matrix f = f_k[1]
+    ret.kept = kept
+    ret.f = f
+
+    dest = opts.dest
+    plot f
+        option with-lines
+        printf "set title \"%s\"", title
+    end plot --output="@dest"
+
+    return ret
+end function
+
+function bundle fdensity_GUI (const series x,
+                              const series d,
+                              scalar scale[0::1],
+                              int control[1:2:1] {"Gaussian", "Epanechnikov"})
+    xname = argname(x)
+    dname = argname(d)
+    title = sprintf("Kernel density of %s by %s", xname, dname)
+
+    bundle opts = fkd_defopts()
+    if exists(opts_in)
+        opts = opts_in + opts
+    endif
+
+    matrices f_k = fkd(x, d, xname, dname, scale, control)
+    kept = f_k[2]
+    bundle ret = opts
+    ret.err = 0
+
+    if nelem(kept) == 0
+        funcerr "Invalid conditioning"
+        ret.err = 1
+        return ret
+    endif
+
+    matrix f = f_k[1]
+    ret.kept = kept
+    ret.f = f
+
+    plot f
+        option with-lines
+        printf "set title \"%s\"", title
+    end plot --output=display
+
+    return ret
+end function
