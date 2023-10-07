@@ -118,27 +118,28 @@ end function
 function bundle fkd_defopts (void)
     /* Bundle holding default values. */
 
-    bundle ret = _(scale = 1,
-                   control = 0,
-                   dest = "display",
-                   title = "",
-                   ylabel = "",
-                   xlabel = "",
-                   fontsize = 10,
-                   linewidth = 1,
-                   pointsize = 0.75,
-                   auto_dashtype = FALSE,
+    bundle ret = _(auto_dashtype = FALSE,
                    auto_pointtype = FALSE,
-                   monochrome = FALSE,
-                   nokey = FALSE,
-                   single_yaxis = FALSE,
-                   grid = FALSE,
-                   MINOBS = 30,
-                   MAXVAL = 12,
                    bw_method = "silverman",
                    bw_skip_na = TRUE,
                    bw_df = TRUE,
-                   bw_verbose = FALSE)
+                   bw_verbose = FALSE,
+                   control = 0,
+                   dest = "display",
+                   fontsize = 10,
+                   grid = FALSE,
+                   linewidth = 1,
+                   MINOBS = 30,
+                   MAXVAL = 12,
+                   monochrome = FALSE,
+                   nokey = FALSE,
+                   pointsize = 0.75,
+                   scale = 1,
+                   single_yaxis = FALSE,
+                   title = "",
+                   ylabel = "",
+                   xlabel = "")
+
     return ret
 end function
 

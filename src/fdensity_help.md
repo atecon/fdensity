@@ -27,7 +27,17 @@ More generally, the option bundle accepts the following keys:
 - `bw_skip_na`: `bool`, Indicator for skipping missing values. 0 to include missing values, 1 to remove them.
 - `bw_verbose`: `bool`, Indicator for printing bandwidth selection results. 0 to disable, 1 to enable.
 - `dest`: string, destination (default = "display")
-- `title`: string, plot title
+- `title`: string, plot title (default = "")
+- `ylabel`: string, label at the y-axis (default = "")
+- `xlabel`: string, label at the x-axis (default = "")
+- `fontsize`: scalar, Size of font for title and labels (default = 10)
+- `linewidth`: scalar, Width of line(s) (default = 1)
+- `pointsize`: scalar, Size of points for lines (default = 0.75; only relevant of `auto_pointtype = TRUE`)
+- `auto_dashtype`: bool, Switch on dashed lines with automatic type selection (default = FALSE)
+- `auto_pointtype`: bool, Switch on lines with points with automatic pointtype selection (default = FALSE)
+- `monochrome`: bool, Lines are coloured black (default = FALSE)
+- `nokey`: bool, Do not show key (legend) (default = FALSE)
+- `single_y_axis`: bool, Enforce single y-axis (default = FALSE)
 
 The returned bundle has the same keys as the option bundle, plus
 
@@ -39,9 +49,11 @@ The returned bundle has the same keys as the option bundle, plus
 
 # Changelog
 
-* **v0.6 (August 2023)**
+* **v0.6 (October 2023)**
+    * Support for various plotting options
     * Add support for automatic optimal bandwidth selection
     * Internal refactoring
+
 
 * **v0.5 (April 2022)**
     * Initial version
