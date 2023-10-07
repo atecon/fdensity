@@ -122,6 +122,17 @@ function bundle fkd_defopts (void)
                    control = 0,
                    dest = "display",
                    title = "",
+                   ylabel = "",
+                   xlabel = "",
+                   fontsize = 10,
+                   linewidth = 1,
+                   pointsize = 0.75,
+                   auto_dashtype = FALSE,
+                   auto_pointtype = FALSE,
+                   monochrome = FALSE,
+                   nokey = FALSE,
+                   single_yaxis = FALSE,
+                   grid = FALSE,
                    MINOBS = 30,
                    MAXVAL = 12,
                    bw_method = "silverman",
@@ -172,14 +183,53 @@ function bundle fdensity (const series x,
     ret.kept = kept
     ret.f = f
 
-    dest = opts.dest
-    plot f
-        option with-lines
-        printf "set title \"%s\"", opts.title
-    end plot --output="@dest"
+    plot_fdensity(ret, opts)
 
     return ret
 end function
+
+
+function void plot_fdensity (const bundle input,
+                             const bundle opts)
+    /* code description
+    return: type, description */
+
+    matrix fdata = input.f
+    string dest = opts.dest
+    string plot_options = opts.auto_pointtype == TRUE ? "with-lp " : \
+                         "with-lines "
+    plot_options += opts.single_yaxis == TRUE ? "single-yaxis " : ""
+
+    string linetype_options = ""
+    if opts.auto_dashtype || opts.auto_pointtype || opts.monochrome
+        linetype_options = "set for [i=1:8] linetype i "
+        if opts.auto_dashtype
+            linetype_options += "dashtype i "
+        endif
+        if opts.auto_pointtype
+            linetype_options += sprintf("pointtype i ps %g ", opts.pointsize)
+        endif
+        if opts.monochrome
+            linetype_options += "lc rgb 'black"
+        endif
+    endif
+
+    string key_opts = opts.nokey == TRUE ? "set nokey" : ""
+    string grid_opts = opts.grid == TRUE ? "set grid" : ""
+
+    plot fdata
+        option @plot_options
+        printf "%s", linetype_options
+        printf "set termoption lw %d", opts.linewidth
+        printf "set title \"%s\" font ',%d'", opts.title, opts.fontsize
+        printf "set ylabel \"%s\" font ',%d'", opts.ylabel, opts.fontsize
+        printf "set xlabel \"%s\" font ',%d'", opts.xlabel, opts.fontsize
+        printf "%s", key_opts
+        printf "%s", grid_opts
+    end plot --output="@dest"
+end function
+
+
 
 function bundle fdensity_GUI (const series x,
                               const series d,
