@@ -138,7 +138,8 @@ function bundle fkd_defopts (void)
                    single_yaxis = FALSE,
                    title = "",
                    ylabel = "",
-                   xlabel = "")
+                   xlabel = "",
+                   add_opts = "")
 
     return ret
 end function
@@ -227,6 +228,7 @@ function void plot_fdensity (const bundle input,
         printf "set xlabel \"%s\" font ',%d'", opts.xlabel, opts.fontsize
         printf "%s", key_opts
         printf "%s", grid_opts
+        printf "%s", opts.add_opts
     end plot --output="@dest"
 end function
 

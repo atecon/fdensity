@@ -38,6 +38,7 @@ More generally, the option bundle accepts the following keys:
 - `monochrome`: bool, Lines are coloured black (default = FALSE)
 - `nokey`: bool, Do not show key (legend) (default = FALSE)
 - `single_y_axis`: bool, Enforce single y-axis (default = FALSE)
+- `add_opts`: string, You may pass additional gnuplot commands as a string (default = "")
 
 The returned bundle has the same keys as the option bundle, plus
 
@@ -49,11 +50,10 @@ The returned bundle has the same keys as the option bundle, plus
 
 # Changelog
 
-* **v0.6 (August 2023)**
+* **v0.6 (October 2023)**
     * Support for various plotting options
     * Add support for automatic optimal bandwidth selection
     * Internal refactoring
-
 
 * **v0.5 (April 2022)**
     * Initial version
