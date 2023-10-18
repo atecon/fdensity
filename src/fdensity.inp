@@ -127,6 +127,7 @@ function bundle fkd_defopts (void)
                    control = 0,
                    dest = "display",
                    fontsize = 10,
+                   fontsize_tics = 10,
                    grid = FALSE,
                    linewidth = 1,
                    MINOBS = 30,
@@ -226,6 +227,8 @@ function void plot_fdensity (const bundle input,
         printf "set title \"%s\" font ',%d'", opts.title, opts.fontsize
         printf "set ylabel \"%s\" font ',%d'", opts.ylabel, opts.fontsize
         printf "set xlabel \"%s\" font ',%d'", opts.xlabel, opts.fontsize
+        printf "set xtics font ',%d'", opts.fontsize_tics
+        printf "set ytics font ',%d'", opts.fontsize_tics
         printf "%s", key_opts
         printf "%s", grid_opts
         printf "%s", opts.add_opts

@@ -31,6 +31,7 @@ More generally, the option bundle accepts the following keys:
 - `ylabel`: string, label at the y-axis (default = "")
 - `xlabel`: string, label at the x-axis (default = "")
 - `fontsize`: scalar, Size of font for title and labels (default = 10)
+- `fontsize_tics`: scalar, Size of font tics on the y- and the x-axis (default = 10)
 - `linewidth`: scalar, Width of line(s) (default = 1)
 - `pointsize`: scalar, Size of points for lines (default = 0.75; only relevant of `auto_pointtype = TRUE`)
 - `auto_dashtype`: bool, Switch on dashed lines with automatic type selection (default = FALSE)
