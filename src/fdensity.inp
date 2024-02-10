@@ -177,7 +177,7 @@ function bundle fdensity (const series x,
     ret.err = 0
 
     if nelem(kept) == 0
-        sprintf "Invalid conditioning\n"
+        printf "Invalid conditioning\n"
         ret.err = 1
         return ret
     endif
