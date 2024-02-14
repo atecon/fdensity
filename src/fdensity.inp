@@ -240,7 +240,7 @@ end function
 function bundle fdensity_GUI (const series x,
                               const series d,
                               scalar scale[0::1],
-                              int control[1:2:1] {"Gaussian", "Epanechnikov"})
+                              int control[0:1:0] {"Gaussian", "Epanechnikov"})
     xname = argname(x)
     dname = argname(d)
     title = sprintf("Kernel density of %s by %s", xname, dname)
