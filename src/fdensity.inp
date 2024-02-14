@@ -51,7 +51,7 @@ function matrices fkd (const series x,
 
             # TODO: We may want to store the optimal bandwidths
             if opts.scale == -1
-                scalar scale = optimal_bandwidth (tmp, opts)
+                scalar scale = optimal_bandwidth(tmp, opts)
             else
                 scalar scale = opts.scale
             endif
