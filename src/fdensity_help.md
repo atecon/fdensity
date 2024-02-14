@@ -20,11 +20,11 @@ appropiate keys in the option bundle. If the `scale` parameter is set to `-1`, t
 More generally, the option bundle accepts the following keys:
 
 - `control`: as in kdensity: kernel choice, 0 = normal (default), 1 = Epanechnikov
-- `scale`: as in kdensity: bandwidth adjustment factor (default 1), Set to `-1` for computing the optimal bandwidth automatically (see the following options)
+- `scale`: as in kdensity: bandwidth adjustment factor (default: 1), Set to `-1` for computing the optimal bandwidth automatically (see the following options)
 - `bw_method`: string, Method for computing optimal bandwidth, either "silverman" or "scott" (default: "silverman")
-- `bw_df`: bool, Indicator for degrees of freedom correction. 0 not to correct, 1 to correct (default).
-- `bw_skip_na`: `bool`, Indicator for skipping missing values. 0 to include missing values, 1 to remove them.
-- `bw_verbose`: `bool`, Indicator for printing bandwidth selection results. 0 to disable, 1 to enable.
+- `bw_df`: bool, Indicator for degrees of freedom correction. `FALSE` not to correct, `TRUE` to correct (default: `TRUE`).
+- `bw_skip_na`: `bool`, Indicator for skipping missing values. `FALSE` to include missing values, `TRUE` to remove them (default: `TRUE`).
+- `bw_verbose`: `bool`, Indicator for printing bandwidth selection results. `FALSE` to disable, `TRUE` to enable (default: `FALSE`).
 - `dest`: string, destination (default = "display")
 - `title`: string, plot title (default = "")
 - `ylabel`: string, label at the y-axis (default = "")
@@ -42,9 +42,8 @@ More generally, the option bundle accepts the following keys:
 
 The returned bundle has the same keys as the option bundle, plus
 
-- `err`: an error code
-- `kept`: a vector holding the distinct values of the factors (from input series `f`) actually used for
-  computing the densities
+- `err`: an error code which is 0 in case of no error, otherwise 1.
+- `kept`: a vector holding the distinct values of the factors (from input series `f`) actually used for computing the densities. (Others may have been skipped due to insufficient number of observations.)
 - `f`: a matrix with `p+1` columns. The first `p` columns hold the estimated density or densities at each of these points and the `p+1`-th column holds a set of evenly spaced abscissae.
 
 
