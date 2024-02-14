@@ -5,8 +5,7 @@ _Warning_: the maximum number of different values for the factor is set to 12 (t
 The function signature is
 
 ```
-function bundle fdensity(const series x, const series d, 
-                         bundle opts_in[null])
+function bundle fdensity(const series x, const series d, bundle opts_in[null])
 ```
 
 Internally, this function uses the `kdensity()` function, and its
@@ -16,7 +15,7 @@ appropiate keys in the option bundle. If the `scale` parameter is set to `-1`, t
 ## Parameters
 
 - `x`:  `series`, Input series for which to compute conditional densities
-- `d`:  `series`, Discrete variable (numeric or string-valued) defining the "factors".
+- `d`:  `series`, Discrete variable (numeric or string-valued) defining the `p` distinct "factors".
 
 More generally, the option bundle accepts the following keys:
 
@@ -44,14 +43,14 @@ More generally, the option bundle accepts the following keys:
 The returned bundle has the same keys as the option bundle, plus
 
 - `err`: an error code
-- `kept`: a vector holding the values of the factor actually used for
+- `kept`: a vector holding the distinct values of the factors (from input series `f`) actually used for
   computing the densities
-- `f`: a matrix with the estimated densities
+- `f`: a matrix with `p+1` columns. The first `p` columns hold the estimated density or densities at each of these points and the `p+1`-th column holds a set of evenly spaced abscissae.
 
 
 # Changelog
 
-* **v0.6 (October 2023)**
+* **v0.6 (February 2024)**
     * Support for various plotting options
     * Add support for automatic optimal bandwidth selection
     * Internal refactoring
