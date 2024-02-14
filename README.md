@@ -5,8 +5,7 @@ _Warning_: the maximum number of different values for the factor is set to 12 (t
 The function signature is
 
 ```
-function bundle fdensity(const series x, const series d, 
-                         bundle opts_in[null])
+function bundle fdensity(const series x, const series d, bundle opts_in[null])
 ```
 
 Internally, this function uses the `kdensity()` function, and its
@@ -16,16 +15,16 @@ appropiate keys in the option bundle. If the `scale` parameter is set to `-1`, t
 ## Parameters
 
 - `x`:  `series`, Input series for which to compute conditional densities
-- `d`:  `series`, Discrete variable (numeric or string-valued) defining the "factors".
+- `d`:  `series`, Discrete variable (numeric or string-valued) defining the `p` distinct "factors".
 
 More generally, the option bundle accepts the following keys:
 
 - `control`: as in kdensity: kernel choice, 0 = normal (default), 1 = Epanechnikov
-- `scale`: as in kdensity: bandwidth adjustment factor (default 1), Set to `-1` for computing the optimal bandwidth automatically (see the following options)
+- `scale`: as in kdensity: bandwidth adjustment factor (default: 1), Set to `-1` for computing the optimal bandwidth automatically (see the following options)
 - `bw_method`: string, Method for computing optimal bandwidth, either "silverman" or "scott" (default: "silverman")
-- `bw_df`: bool, Indicator for degrees of freedom correction. 0 not to correct, 1 to correct (default).
-- `bw_skip_na`: `bool`, Indicator for skipping missing values. 0 to include missing values, 1 to remove them.
-- `bw_verbose`: `bool`, Indicator for printing bandwidth selection results. 0 to disable, 1 to enable.
+- `bw_df`: bool, Indicator for degrees of freedom correction. `FALSE` not to correct, `TRUE` to correct (default: `TRUE`).
+- `bw_skip_na`: `bool`, Indicator for skipping missing values. `FALSE` to include missing values, `TRUE` to remove them (default: `TRUE`).
+- `bw_verbose`: `bool`, Indicator for printing bandwidth selection results. `FALSE` to disable, `TRUE` to enable (default: `FALSE`).
 - `dest`: string, destination (default = "display")
 - `title`: string, plot title (default = "")
 - `ylabel`: string, label at the y-axis (default = "")
@@ -34,24 +33,23 @@ More generally, the option bundle accepts the following keys:
 - `fontsize_tics`: scalar, Size of font tics on the y- and the x-axis (default = 10)
 - `linewidth`: scalar, Width of line(s) (default = 1)
 - `pointsize`: scalar, Size of points for lines (default = 0.75; only relevant of `auto_pointtype = TRUE`)
-- `auto_dashtype`: bool, Switch on dashed lines with automatic type selection (default = FALSE)
-- `auto_pointtype`: bool, Switch on lines with points with automatic pointtype selection (default = FALSE)
-- `monochrome`: bool, Lines are coloured black (default = FALSE)
-- `nokey`: bool, Do not show key (legend) (default = FALSE)
-- `single_y_axis`: bool, Enforce single y-axis (default = FALSE)
+- `auto_dashtype`: bool, Switch on dashed lines with automatic type selection (default = `FALSE`)
+- `auto_pointtype`: bool, Switch on lines with points with automatic pointtype selection (default = `FALSE`)
+- `monochrome`: bool, Lines are coloured black (default = `FALSE`)
+- `nokey`: bool, Do not show key (legend) (default = `FALSE`)
+- `single_y_axis`: bool, Enforce single y-axis (default = `FALSE`)
 - `add_opts`: string, You may pass additional gnuplot commands as a string (default = "")
 
 The returned bundle has the same keys as the option bundle, plus
 
-- `err`: an error code
-- `kept`: a vector holding the values of the factor actually used for
-  computing the densities
-- `f`: a matrix with the estimated densities
+- `err`: an error code which is 0 in case of no error, otherwise 1.
+- `kept`: a vector holding the distinct values of the factors (from input series `f`) actually used for computing the densities. (Others may have been skipped due to insufficient number of observations.)
+- `f`: a matrix with `p+1` columns. The first `p` columns hold the estimated density or densities at each of these points and the `p+1`-th column holds a set of evenly spaced abscissae.
 
 
 # Changelog
 
-* **v0.6 (October 2023)**
+* **v0.6 (February 2024)**
     * Support for various plotting options
     * Add support for automatic optimal bandwidth selection
     * Internal refactoring

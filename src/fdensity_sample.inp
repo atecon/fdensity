@@ -1,7 +1,7 @@
 set verbose off
 include fdensity.gfn
 
-EXAMPLE = 1
+EXAMPLE = 1   # Select an example to run
 
 if EXAMPLE == 1
     # artificial, with dummy factor
@@ -11,13 +11,15 @@ if EXAMPLE == 1
     x = d ? normal() : 3 + normal()/2
     freq x --silent --plot=display
     boxplot x d --factorized --output=display	
-    b = fdensity(x, d)
+    bundle b = fdensity(x, d)
     print "three plots should have appeared"
+
 elif EXAMPLE == 2
     # discrete numerical factor
     open keane.gdt --quiet
     fdensity(lwage, choice)
     print "a plot should have appeared"
+
 elif EXAMPLE == 3
     # same as above, with string-valued factor
     open keane.gdt --quiet
@@ -25,6 +27,7 @@ elif EXAMPLE == 3
     stringify(str_ch, strsplit("sch home wc bc serv"))
     fdensity(lwage, str_ch)
     print "a plot should have appeared"
+
 elif EXAMPLE == 4
     # same as example 1, with different options
     set seed 12041996
@@ -32,9 +35,12 @@ elif EXAMPLE == 4
     d = uniform() < 0.4
     x = d ? normal() : 3 + normal()/2
     my_title = "Smaller bandwidth, Epanechnikov kernel"
-    opts = defbundle("scale", 0.8, "control", 1, "title", my_title)
+    bundle opts = _(scale = 0.8, control = 1, title = my_title,
+                    monochrome = TRUE, auto_dashtype = TRUE,
+                    linewidth = 2)
     b = fdensity(x, d, opts)
     print "a plot should have appeared"
+
 elif EXAMPLE == 5
     # same as example 1, with different options
     set seed 12041996
@@ -43,8 +49,7 @@ elif EXAMPLE == 5
     x = d ? normal() : 3 + normal()/2
     my_title = "Smaller bandwidth, Epanechnikov kernel but optimal bandwidth selection"
     opts = _(scale = -1, control = 1, bw_method = "silverman",
-             title = my_title,
-             add_opts = "set xrange[-1:1]")
+             title = my_title, add_opts = "set xrange[-1:1]")
     b = fdensity(x, d, opts)
     print "a plot should have appeared"
 endif
