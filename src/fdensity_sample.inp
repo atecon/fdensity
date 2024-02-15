@@ -1,7 +1,7 @@
 set verbose off
 include fdensity.gfn
 
-EXAMPLE = 5   # Select an example to run
+EXAMPLE = 1   # Select an example to run
 
 if EXAMPLE == 1
     # artificial, with dummy factor
