@@ -35,7 +35,7 @@ end function
 
 function matrices fkd (const series x,
                        const series d,
-                       const bundle opts)
+                       bundle opts)
     v = values(d)
     nv = rows(v)
     matrix f = {}
@@ -60,12 +60,11 @@ function matrices fkd (const series x,
 
             # TODO: We may want to store the optimal bandwidths
             if opts.scale == 1
-                scalar scale = optimal_bandwidth(tmp, opts)
-            else
-                scalar scale = opts.scale
+                # overwrite original scale parameter
+                scalar opts.scale = optimal_bandwidth(tmp, opts)
             endif
 
-            matrix kd = kdensity(tmp, scale, opts.control)
+            matrix kd = kdensity(tmp, opts.scale, opts.control)
 
             n = rows(kd)
             X |= kd[,1]
@@ -269,40 +268,36 @@ end function
 
 
 
-function bundle fdensity_GUI (const series x,
-                              const series d,
-                              scalar scale[0::1],
+function bundle fdensity_GUI (const series x "Input",
+                              const series d "Factors",
+                              scalar scale[0::1] "Bandwidth, 1=autom.",
                               int control[0:1:0] {"Gaussian", "Epanechnikov"})
-    xname = argname(x)
-    dname = argname(d)
-    title = sprintf("Kernel density of %s by %s", xname, dname)
+    /* Function for creating GUI dialog box. */
 
-    bundle opts = fkd_defopts()
-    if exists(opts_in)
-        opts = opts_in + opts
-    endif
+    bundle self = fkd_defopts()
+    self.scalar = scale
+    self.control = control
+    self.xname = argname(x)
+    self.dname = argname(d)
+    self.title = sprintf("Kernel density of %s by %s", self.xname, self.dname)
 
-    matrices f_k = fkd(x, d, xname, dname, scale, control)
-    kept = f_k[2]
-    bundle ret = opts
-    ret.err = 0
+    matrices f_k = fkd(x, d, self)
+    matrix kept = f_k[2]
+    scalar self.err = FALSE
 
     if nelem(kept) == 0
         funcerr "Invalid conditioning"
-        ret.err = 1
-        return ret
+        self.err = TRUE
+        return self
     endif
 
-    matrix f = f_k[1]
-    ret.kept = kept
-    ret.f = f
+    self.kept = kept
+    matrix self.f = f_k[1]
+    matrix f = self.f  # for plotting only
 
-    plot f
-        option with-lines
-        printf "set title \"%s\"", title
-    end plot --output=display
+    plot_fdensity(self, self)
 
-    return ret
+    return self
 end function
 
 

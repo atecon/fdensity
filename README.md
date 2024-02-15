@@ -4,6 +4,7 @@ This function computes and draws the conditional densities of `x` for each value
 
 _Warning_: the maximum number of different values for the factor is set to `MAXVAL = 12` (the plot would be unreadable otherwise IMO). Moreover, in order to compute the conditional density, at least `MINOBS = 30` valid observations must be available for each category. Categories that don't meet that requirement will be ignored.
 
+
 The function signature is
 
 ```
@@ -45,8 +46,14 @@ More generally, the option bundle accepts the following keys:
 The returned bundle has the same keys as the option bundle, plus
 
 - `err`: an error code which is `0` in case of no error, otherwise `1`.
-- `kept`: a vector holding the distinct values of the factors (from input series `f`) actually used for computing the densities. (Others may have been skipped due to insufficient number of observations.)
 - `f`: a matrix with `p+1` columns. The first `p` columns hold the estimated density or densities at each of these points and the `p+1`-th column holds a set of evenly spaced abscissae.
+- `kept`: a vector holding the distinct values of the factors (from input series `f`) actually used for computing the densities. (Others may have been skipped due to insufficient number of observations.)
+- `scale`: scalar value holding the optimal bandwitdh if the original value of `scale` is `1` in which case the optimal bandwidth gets computed.
+
+
+## GUI access
+
+The dialog box can be opened via `View -> Graph specified vars -> Factorized density`.
 
 
 # Changelog
