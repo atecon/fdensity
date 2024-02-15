@@ -1,5 +1,13 @@
 function matrix fill (const matrix f,
                       const matrix xcoord)
+    /*
+    This function fills in missing values in a matrix using linear interpolation.
+    Parameters:
+      - f: The matrix containing the values to be filled.
+      - xcoord: The matrix containing the corresponding x-coordinates for each value in f.
+        Returns: The matrix with missing values filled using linear interpolation.
+    */
+
     n = rows(f)
     valid = selifr(seq(1,n)', ok(f))
     nv = rows(valid)
@@ -21,6 +29,7 @@ function matrix fill (const matrix f,
         v = f[lo] + (xcoord[lo+1:hi-1] - xlo) * d
         ret[lo+1:hi-1] = v'
     endloop
+
     return ret
 end function
 
@@ -146,9 +155,21 @@ function bundle fkd_defopts (void)
 end function
 
 
+
 function bundle fdensity (const series x,
                           const series d,
                           bundle opts_in[null])
+
+    /*
+    This function calculates the kernel density estimation for a given series.
+    Parameters:
+      - x: The series for which the kernel density is calculated.
+      - d: The conditioning series.
+      - opts_in: Optional bundle of options for the kernel density estimation.
+    Returns:
+      A bundle containing the kernel density estimation results and options.
+    */
+
     bundle opts = fkd_defopts()
     if exists(opts_in)
         opts = opts_in + opts
@@ -194,8 +215,19 @@ end function
 
 function void plot_fdensity (const bundle input,
                              const bundle opts)
-    /* code description
-    return: type, description */
+
+    /*
+    * Function: plot_fdensity
+    * -----------------------
+    * Plots the density function using the given input data and options.
+    *
+    * Parameters:
+    *    input - A bundle containing the input data.
+    *    opts - A bundle containing the plot options.
+    *
+    * Returns:
+    *    None
+    */
 
     matrix fdata = input.f
     string dest = opts.dest
