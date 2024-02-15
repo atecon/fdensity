@@ -1,7 +1,7 @@
 set verbose off
 include fdensity.gfn
 
-EXAMPLE = 1   # Select an example to run
+EXAMPLE = 5   # Select an example to run
 
 if EXAMPLE == 1
     # artificial, with dummy factor
@@ -11,6 +11,7 @@ if EXAMPLE == 1
     x = d ? normal() : 3 + normal()/2
     freq x --silent --plot=display
     boxplot x d --factorized --output=display	
+
     bundle b = fdensity(x, d)
     print "three plots should have appeared"
 
@@ -25,6 +26,7 @@ elif EXAMPLE == 3
     open keane.gdt --quiet
     series str_ch = choice
     stringify(str_ch, strsplit("sch home wc bc serv"))
+
     fdensity(lwage, str_ch)
     print "a plot should have appeared"
 
@@ -38,6 +40,7 @@ elif EXAMPLE == 4
     bundle opts = _(scale = 0.8, control = 1, title = my_title,
                     monochrome = TRUE, auto_dashtype = TRUE,
                     linewidth = 2)
+
     b = fdensity(x, d, opts)
     print "a plot should have appeared"
 
@@ -48,8 +51,9 @@ elif EXAMPLE == 5
     d = uniform() < 0.4
     x = d ? normal() : 3 + normal()/2
     my_title = "Smaller bandwidth, Epanechnikov kernel but optimal bandwidth selection"
-    opts = _(scale = -1, control = 1, bw_method = "silverman",
-             title = my_title, add_opts = "set xrange[-1:1]")
+    opts = _(scale = 1, control = 1, bw_method = "scott",
+             title = my_title, add_opts = "set xrange[-2:2]")
+
     b = fdensity(x, d, opts)
-    print "a plot should have appeared"
+    print "a plot with a restricted x-range should have appeared"
 endif
