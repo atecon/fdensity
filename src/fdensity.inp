@@ -115,7 +115,6 @@ function scalar optimal_bandwidth (const series y,
 
     scalar bw = kde_bandwidth({y},
                               opts.bw_method,
-                              opts.bw_df,
                               opts.bw_skip_na,
                               opts.bw_verbose)
 
@@ -130,14 +129,13 @@ function bundle fkd_defopts (void)
                    auto_pointtype = FALSE,
                    bw_method = "silverman",
                    bw_skip_na = TRUE,
-                   bw_df = TRUE,
                    bw_verbose = FALSE,
                    control = 0,
                    dest = "display",
                    fontsize = 10,
                    fontsize_tics = 10,
                    grid = FALSE,
-                   linewidth = 1,
+                   linewidth = 2.0,
                    MINOBS = 30,
                    MAXVAL = 12,
                    monochrome = FALSE,
@@ -190,6 +188,7 @@ function bundle fdensity (const series x,
         opts.title = sprintf("Kernel density of %s by %s",
                              opts.xname, opts.dname)
     endif
+
 
     matrices f_k = fkd(x, d, opts)
     kept = f_k[2]
@@ -316,7 +315,6 @@ end function
 
 function scalar kde_bandwidth (matrix input,
                                string method,
-                               const bool df_correction[0::1],
                                const int skip_na[0:1:1],
                                const int verbose[0:1:0])
     /*
@@ -325,8 +323,7 @@ function scalar kde_bandwidth (matrix input,
 
        Parameters:
        input (matrix): Input data as a column vector.
-       method (string): Method for bandwidth selection. Supported values: "scott" or "silverman".
-       df_correction (bool): Indicator for degrees of freedom correction
+       method (string): Method for bandwidth selection. Supported value: "silverman".
        when computing the standard devation. FALSE not to correct, TRUE to
        correct.
        skip_na (bool): Indicator for skipping missing values. 0 to include missing values, 1 to remove them.
@@ -344,11 +341,8 @@ function scalar kde_bandwidth (matrix input,
     errorif(cols(input) > 1, "Only column vector is supported")
     matrix input = skip_na == TRUE ? remove_nas(input) : input
     scalar n = rows(input)
-    scalar std_dev = sdc(input, df_correction)
 
-    if method == "scott"
-        scalar bandwidth = bandwidth_scott(std_dev, n)
-    elif method == "silverman"
+    if method == "silverman"
         # This value makes sure that gretl's built-in kdensity() automatically
         # applies Silverman's method. No need to do the job on our own.
         scalar bandwidth = 1
@@ -360,7 +354,7 @@ function scalar kde_bandwidth (matrix input,
     endif
 
     if verbose
-        bandwidth_print(method, df_correction, skip_na, bandwidth)
+        bandwidth_print(method, skip_na, bandwidth)
     endif
 
     return bandwidth
@@ -368,35 +362,16 @@ end function
 
 
 function void bandwidth_print (const string method,
-                               const int df_correction[0::1],
                                const int skip_na[0:1:1],
                                const scalar bandwidth)
     /* Print out results. */
 
-    string df_corr = df_correction == TRUE ? "TRUE" : "FALSE"
     string str_skip_na = skip_na == TRUE ? "TRUE" : "FALSE"
 
     printf("\n*** Bandwidth Selection Results ***\n")
     printf("Method: %s\n", method)
-    printf("Degrees of freedom correction: %s\n", df_corr)
     printf("Skip NAs: %s\n", str_skip_na)
     printf("Bandwidth: %g\n\n", bandwidth)
-end function
-
-
-function scalar bandwidth_scott (const scalar std_dev,
-                                 const scalar n)
-    /* Calculate the bandwidth for kernel density estimation (KDE) using Scott's rule.
-
-    Parameters:
-    std_dev (scalar): Standard deviation of the input data.
-    n (scalar): Number of observations in the input data.
-
-    Returns:
-    scalar: The calculated bandwidth for KDE using Scott's rule. */
-
-    scalar bandwidth = 3.49 * std_dev * n ^ (-0.333)
-    return bandwidth
 end function
 
 
