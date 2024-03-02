@@ -4,6 +4,8 @@ This function computes and draws the conditional densities of `x` for each value
 
 _Warning_: the maximum number of different values for the factor is set to `MAXVAL = 12` (the plot would be unreadable otherwise IMO). Moreover, in order to compute the conditional density, at least `MINOBS = 30` valid observations must be available for each category. Categories that don't meet that requirement will be ignored.
 
+Please ask questions and report bugs on the Gretl mailing list if possible. Alternatively, create an issue ticket on the github repo (see below).
+Source code and test script(s) can be found here: https://github.com/atecon/fdensity
 
 The function signature is
 

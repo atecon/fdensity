@@ -1,5 +1,5 @@
-author = Riccardo "Jack" Lucchetti and Artur Tarassow
-email = r.lucchetti@univpm.it
+author = Artur Tarassow and Riccardo "Jack" Lucchetti
+email = atecon@posteo.de
 version = 0.6
 date = 2024-03-02
 description = Factorized kernel density estimation

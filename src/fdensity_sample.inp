@@ -50,8 +50,8 @@ elif EXAMPLE == 5
     nulldata 8192
     d = uniform() < 0.4
     x = d ? normal() : 3 + normal()/2
-    my_title = "Smaller bandwidth, Epanechnikov kernel but optimal bandwidth selection"
-    opts = _(scale = 1, control = 1, bw_method = "scott",
+    my_title = "Automatic bandwidth and Epanechnikov kernel"
+    opts = _(scale = 1, control = 1,
              title = my_title, add_opts = "set xrange[-2:2]")
 
     b = fdensity(x, d, opts)
