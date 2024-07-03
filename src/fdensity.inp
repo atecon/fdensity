@@ -37,12 +37,12 @@ function matrices fkd (const series x,
                        const series d,
                        bundle opts)
     v = values(d)
-    nv = rows(v)
+    n_factor_values = rows(v)
     matrix f = {}
     matrix kept = {}
 
-    if nv > opts.MAXVAL
-        printf "Too many values for factor (%d, max. 12)\n", nv
+    if n_factor_values > opts.MAXVAL
+        printf "Too many values for factor (%d, max. 12)\n", n_factor_values
         return defarray(f, kept)
     endif
 
@@ -50,7 +50,7 @@ function matrices fkd (const series x,
     matrix X = {}
     matrix Y = {}
 
-    loop i = 1 .. nv
+    loop i = 1..n_factor_values
         di = v[i]
         series tmp = d == di ? x : NA
         nn = nobs(tmp)
@@ -68,8 +68,14 @@ function matrices fkd (const series x,
 
             n = rows(kd)
             X |= kd[,1]
-            Yi = mshape(NA, n, nv)
+            Yi = mshape(NA, n, n_factor_values)
             Yi[,i] = kd[,2]
+
+            if opts.cumulative
+                Yi = cum(Yi)
+                Yi = Yi ./ max(Yi)
+            endif
+
             Y |= Yi
         endif
     endloop
@@ -83,7 +89,7 @@ function matrices fkd (const series x,
         X = X[,2]
         Z = mshape(NA, n, nk)
 
-        loop i = 1 .. nk
+        loop i = 1..nk
             j = kept[i]
             Z[,i] = fill(Y[ndx,j], X)
         endloop
@@ -96,7 +102,7 @@ function matrices fkd (const series x,
         else
             matrix v = values(d)
             strings clabels = array(nk)
-            loop i = 1 .. nk
+            loop i = 1..nk
                 clabels[i] = sprintf("%s = %d", opts.dname, v[kept[i]])
             endloop
         endif
@@ -104,6 +110,7 @@ function matrices fkd (const series x,
         cnameset(f, clabels)
         ret = defarray(f, kept)
     endif
+
     return ret
 end function
 
@@ -125,17 +132,20 @@ end function
 function bundle fkd_defopts (void)
     /* Bundle holding default values. */
 
-    bundle ret = _(auto_dashtype = FALSE,
+    bundle ret = _(add_opts = "",
+                   auto_dashtype = FALSE,
                    auto_pointtype = FALSE,
                    bw_method = "silverman",
                    bw_skip_na = TRUE,
                    bw_verbose = FALSE,
                    control = 0,
+                   cumulative = FALSE,
                    dest = "display",
                    fontsize = 10,
                    fontsize_tics = 10,
-                   grid = FALSE,
+                   grid = TRUE,
                    linewidth = 2.0,
+                   logscale = FALSE,
                    MINOBS = 30,
                    MAXVAL = 12,
                    monochrome = FALSE,
@@ -145,12 +155,10 @@ function bundle fkd_defopts (void)
                    single_yaxis = FALSE,
                    title = "",
                    ylabel = "",
-                   xlabel = "",
-                   add_opts = "")
+                   xlabel = "")
 
     return ret
 end function
-
 
 
 function bundle fdensity (const series x,
@@ -249,6 +257,7 @@ function void plot_fdensity (const bundle input,
 
     string key_opts = opts.nokey == TRUE ? "set nokey" : ""
     string grid_opts = opts.grid == TRUE ? "set grid" : ""
+    string logscale_opts = opts.logscale == TRUE ? "set logscale y 10" : ""
 
     plot fdata
         option @plot_options
@@ -262,6 +271,7 @@ function void plot_fdensity (const bundle input,
         printf "%s", key_opts
         printf "%s", grid_opts
         printf "%s", opts.add_opts
+        printf "%s", logscale_opts
     end plot --output="@dest"
 end function
 

@@ -20,24 +20,27 @@ Internally, this function uses the `kdensity()` function, and its optional param
 
 More generally, the option bundle accepts the following keys:
 
-- `control`: as in kdensity: kernel choice, 0 = Gaussian (default), 1 = Epanechnikov
-- `scale`: as in gretl's built-in function `kdensity()`: bandwidth adjustment factor; By default this value is `1` and the optimal bandwidth is computed by Silverman's method.
+- `add_opts`: string, You may pass additional gnuplot commands as a string (default = "")
+- `auto_dashtype`: bool, Switch on dashed lines with automatic type selection (default = `FALSE`)
+- `auto_pointtype`: bool, Switch on lines with points with automatic pointtype selection (default = `FALSE`)
 - `bw_skip_na`: `bool`, Indicator for skipping missing values. `FALSE` to include missing values, `TRUE` to remove them (default: `TRUE`).
 - `bw_verbose`: `bool`, Indicator for printing bandwidth selection results. `FALSE` to disable, `TRUE` to enable (default: `FALSE`).
+- `control`: as in kdensity: kernel choice, 0 = Gaussian (default), 1 = Epanechnikov
+- `cumulative`: `bool`, Compute cumulative distribution function (default = `FALSE`)
 - `dest`: string, destination (default = `display`)
+- `fontsize`: scalar, Size of font for title and labels (default: `10`)
+- `fontsize_tics`: scalar, Size of font tics on the y- and the x-axis (default: `10`)
+- `grid`: bool, Show grid (default = `TRUE`)
+- `linewidth`: scalar, Width of line(s) (default: `2.0`)
+- `logscale`: bool, Logarithmic scale on the y-axis (logbase 10) (default = `FALSE`)
+- `monochrome`: bool, Lines are coloured black (default = `FALSE`)
+- `nokey`: bool, Do not show key (legend) (default = `FALSE`)
+- `pointsize`: scalar, Size of points for lines (default: `0.75`; only relevant if `auto_pointtype = TRUE`)
+- `scale`: as in gretl's built-in function `kdensity()`: bandwidth adjustment factor; By default this value is `1` and the optimal bandwidth is computed by Silverman's method.
+- `single_y_axis`: bool, Enforce single y-axis (default = `FALSE`)
 - `title`: string, plot title (default = "")
 - `ylabel`: string, label at the y-axis (default = "")
 - `xlabel`: string, label at the x-axis (default = "")
-- `fontsize`: scalar, Size of font for title and labels (default: `10`)
-- `fontsize_tics`: scalar, Size of font tics on the y- and the x-axis (default: `10`)
-- `linewidth`: scalar, Width of line(s) (default: `2.0`)
-- `pointsize`: scalar, Size of points for lines (default: `0.75`; only relevant if `auto_pointtype = TRUE`)
-- `auto_dashtype`: bool, Switch on dashed lines with automatic type selection (default = `FALSE`)
-- `auto_pointtype`: bool, Switch on lines with points with automatic pointtype selection (default = `FALSE`)
-- `monochrome`: bool, Lines are coloured black (default = `FALSE`)
-- `nokey`: bool, Do not show key (legend) (default = `FALSE`)
-- `single_y_axis`: bool, Enforce single y-axis (default = `FALSE`)
-- `add_opts`: string, You may pass additional gnuplot commands as a string (default = "")
 
 The returned bundle has the same keys as the option bundle, plus
 
@@ -53,6 +56,11 @@ The dialog box can be opened via `View -> Graph specified vars -> Factorized den
 
 
 # Changelog
+
+* **v0.7 (July 2024)**
+    * Add new parameter `cumulative` for computing the cumulative distribution (default: FALSE)
+    * Add new parameter `grid` for showing grid (default: `TRUE`)
+    * Add new parameter `logscale` for logarithmic scale on the y-axis (logbase 10) (default: `FALSE`)
 
 * **v0.6 (March 2024)**
     * Support for various plotting options
