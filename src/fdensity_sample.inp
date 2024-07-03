@@ -1,7 +1,7 @@
 set verbose off
 include fdensity.gfn
 
-EXAMPLE = 1   # Select an example to run
+EXAMPLE = 7   # Select an example to run
 
 if EXAMPLE == 1
     # artificial, with dummy factor
@@ -39,7 +39,8 @@ elif EXAMPLE == 4
     my_title = "Smaller bandwidth, Epanechnikov kernel"
     bundle opts = _(scale = 0.8, control = 1, title = my_title,
                     monochrome = TRUE, auto_dashtype = TRUE,
-                    linewidth = 2)
+                    linewidth = 2, grid = FALSE, cumulative = TRUE,
+                    logscale = FALSE)
 
     b = fdensity(x, d, opts)
     print "a plot should have appeared"
@@ -56,4 +57,19 @@ elif EXAMPLE == 5
 
     b = fdensity(x, d, opts)
     print "a plot with a restricted x-range should have appeared"
+
+
+elif EXAMPLE == 6
+    # artificial, with dummy factor
+    set seed 12041996
+    nulldata 8192
+    d = uniform() < 0.4
+    list X = mat2list(mnormal($nobs, 7) .+ {d})
+    bundles B = fdensity(X, d)
+    #print "three plots should have appeared"
+
+elif EXAMPLE == 7
+    open mroz87 --quiet
+    list L = WA HA WE HE
+    bundles B = fdensity(L, KL6)
 endif

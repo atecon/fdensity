@@ -161,9 +161,9 @@ function bundle fkd_defopts (void)
 end function
 
 
-function bundle fdensity (const series x,
-                          const series d,
-                          bundle opts_in[null])
+function bundle fdensity_series (const series x,
+                                 const series d,
+                                 bundle opts_in[null])
 
     /*
     This function calculates the kernel density estimation for a given series.
@@ -217,6 +217,36 @@ function bundle fdensity (const series x,
 
     return ret
 end function
+
+
+function bundles fdensity (const list L,
+                           const series d,
+                           bundle opts_in[null])
+    /* code description
+    return: type, description */
+
+
+    scalar nL = nelem(L)
+    bundles Ret = array(nL)
+
+    if nL == 1
+        Ret[1] = fdensity_series(L[1], d, opts_in)
+    else
+        scalar width = 320 * ceil(sqrt(nL))
+        scalar height = 240 * ceil(sqrt(nL))
+
+        gpbuild Plots
+            loop i = 1..nL
+                Ret[i] = fdensity_series(L[i], d, opts_in)
+            endloop
+        end gpbuild
+
+        gridplot Plots --width=width --height=height --output=display
+    endif
+
+    return Ret
+end function
+
 
 
 function void plot_fdensity (const bundle input,
