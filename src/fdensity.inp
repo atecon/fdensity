@@ -129,7 +129,7 @@ function scalar optimal_bandwidth (const series y,
 end function
 
 
-function bundle fkd_defopts (void)
+function bundle default_options (void)
     /* Bundle holding default values. */
 
     bundle ret = _(add_opts = "",
@@ -154,6 +154,8 @@ function bundle fkd_defopts (void)
                    scale = 1,
                    single_yaxis = FALSE,
                    title = "",
+                   width = 320,
+                   height = 240,
                    ylabel = "",
                    xlabel = "")
 
@@ -163,40 +165,27 @@ end function
 
 function bundle fdensity_series (const series x,
                                  const series d,
-                                 bundle opts_in[null])
+                                 bundle opts)
 
     /*
     This function calculates the kernel density estimation for a given series.
     Parameters:
       - x: The series for which the kernel density is calculated.
       - d: The conditioning series.
-      - opts_in: Optional bundle of options for the kernel density estimation.
+      - opts: Bundle of options for the kernel density estimation.
     Returns:
       A bundle containing the kernel density estimation results and options.
     */
 
-    bundle opts = fkd_defopts()
-    if exists(opts_in)
-        opts = opts_in + opts
-    endif
-
-    opts.xname = argname(x)
+    # TODO: I guess the strings cannot be empty
+    /*
     if strlen(opts.xname) == 0
         opts.xname = "(anonymous)"
     endif
-
-    opts.dname = argname(d)
     if strlen(opts.dname) == 0
         opts.dname = "(anonymous)"
     endif
-
-    if strlen(opts.title)
-        opts.title = opts.title
-    else
-        opts.title = sprintf("Kernel density of %s by %s",
-                             opts.xname, opts.dname)
-    endif
-
+    */
 
     matrices f_k = fkd(x, d, opts)
     kept = f_k[2]
@@ -213,38 +202,54 @@ function bundle fdensity_series (const series x,
     ret.kept = kept
     ret.f = f
 
-    plot_fdensity(ret, opts)
-
     return ret
 end function
 
 
 function bundles fdensity (const list L,
                            const series d,
-                           bundle opts_in[null])
+                           bundle opts[null])
     /* code description
     return: type, description */
 
-
     scalar nL = nelem(L)
     bundles Ret = array(nL)
+    bundle self = exists(opts) ? opts : _()
+    self = self + default_options()
+    strings xnames = varnames(L)
+    string self.dname = argname(d)
+    self.nL = nL
 
-    if nL == 1
-        Ret[1] = fdensity_series(L[1], d, opts_in)
+    if self.nL == 1
+        self.xname = xnames[1]
+        Ret[1] = fdensity_series(L[1], d, self)
+        plot_fdensity(Ret[1], self)
     else
-        scalar width = 320 * ceil(sqrt(nL))
-        scalar height = 240 * ceil(sqrt(nL))
-
         gpbuild Plots
-            loop i = 1..nL
-                Ret[i] = fdensity_series(L[i], d, opts_in)
+            loop i = 1..self.nL
+                self.xname = xnames[i]
+                Ret[i] = fdensity_series(L[i], d, self)
+
+                self.nokey = i == 2 ? TRUE : self.nokey
+                plot_fdensity(Ret[i], self)
             endloop
         end gpbuild
 
-        gridplot Plots --width=width --height=height --output=display
+        gridplot_fdensity(Plots, self)
     endif
 
     return Ret
+end function
+
+function void gridplot_fdensity (const strings Plots,
+                                 const bundle self)
+    /* code description
+    return: type, description */
+    scalar width = ceil(self.width * sqrt(self.nL))
+    scalar height = ceil(self.height * sqrt(self.nL))
+    string dest = self.dest
+
+    gridplot Plots --width=width --height=height --output="@dest"
 end function
 
 
@@ -267,6 +272,13 @@ function void plot_fdensity (const bundle input,
 
     matrix fdata = input.f
     string dest = opts.dest
+
+    if strlen(opts.title)
+        title = opts.title
+    else
+        title = sprintf("Kernel density of %s by %s", opts.xname, opts.dname)
+    endif
+
     string plot_options = opts.auto_pointtype == TRUE ? "with-lp " : \
                          "with-lines "
     plot_options += opts.single_yaxis == TRUE ? "single-yaxis " : ""
@@ -293,7 +305,7 @@ function void plot_fdensity (const bundle input,
         option @plot_options
         printf "%s", linetype_options
         printf "set termoption lw %d", opts.linewidth
-        printf "set title \"%s\" font ',%d'", opts.title, opts.fontsize
+        printf "set title \"%s\" font ',%d'", title, opts.fontsize
         printf "set ylabel \"%s\" font ',%d'", opts.ylabel, opts.fontsize
         printf "set xlabel \"%s\" font ',%d'", opts.xlabel, opts.fontsize
         printf "set xtics font ',%d'", opts.fontsize_tics
@@ -313,7 +325,7 @@ function bundle fdensity_GUI (const series x "Input",
                               int control[0:1:0] {"Gaussian", "Epanechnikov"})
     /* Function for creating GUI dialog box. */
 
-    bundle self = fkd_defopts()
+    bundle self = default_options()
     self.scalar = scale
     self.control = control
     self.xname = argname(x)

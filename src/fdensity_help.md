@@ -31,6 +31,7 @@ More generally, the option bundle accepts the following keys:
 - `fontsize`: scalar, Size of font for title and labels (default: `10`)
 - `fontsize_tics`: scalar, Size of font tics on the y- and the x-axis (default: `10`)
 - `grid`: bool, Show grid (default = `TRUE`)
+- `height`: scalar, Height of the plot in pixels (default = `240`)
 - `linewidth`: scalar, Width of line(s) (default: `2.0`)
 - `logscale`: bool, Logarithmic scale on the y-axis (logbase 10) (default = `FALSE`)
 - `monochrome`: bool, Lines are coloured black (default = `FALSE`)
@@ -39,6 +40,7 @@ More generally, the option bundle accepts the following keys:
 - `scale`: as in gretl's built-in function `kdensity()`: bandwidth adjustment factor; By default this value is `1` and the optimal bandwidth is computed by Silverman's method.
 - `single_y_axis`: bool, Enforce single y-axis (default = `FALSE`)
 - `title`: string, plot title (default = "")
+- `width`: scalar, Width of the plot in pixels (default = 320)
 - `ylabel`: string, label at the y-axis (default = "")
 - `xlabel`: string, label at the x-axis (default = "")
 
