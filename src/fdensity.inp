@@ -5,7 +5,7 @@ function matrix fill (const matrix f,
     Parameters:
       - f: The matrix containing the values to be filled.
       - xcoord: The matrix containing the corresponding x-coordinates for each value in f.
-        Returns: The matrix with missing values filled using linear interpolation.
+    Returns: The matrix with missing values filled using linear interpolation.
     */
 
     n = rows(f)
@@ -36,6 +36,36 @@ end function
 function matrices fkd (const series x,
                        const series d,
                        bundle opts)
+    /*
+    fkd: Factor-based Kernel Density Estimation
+
+    This function performs kernel density estimation (KDE) for a given numeric series `x`,
+    grouped by the factor values in series `d`, and according to options specified in `opts`.
+
+    Parameters:
+    - x (const series): The numeric series for which the KDE is to be computed.
+    - d (const series): The factor series, where each unique value represents a group.
+    - opts (bundle): A bundle containing options for the KDE computation. Expected keys include:
+        - MAXVAL (int): The maximum number of unique values allowed in `d`.
+        - MINOBS (int): The minimum number of observations required within a group to perform KDE.
+        - scale (scalar): The bandwidth to use for KDE. If `opts.scale` is 1, the optimal bandwidth is computed.
+        - control (scalar): Additional control parameter for KDE.
+        - cumulative (bool): If true, computes the cumulative distribution function instead of the density.
+        - dname (string): The name of the factor series `d`.
+        - xname (string): The name of the numeric series `x`.
+
+    Returns:
+    - matrices: A 2-element array containing:
+        1. A matrix where each column represents the KDE for a group in `d`, with the group's factor value as the column name.
+        2. A matrix `kept` indicating the indices of the factor values in `d` for which KDE was computed.
+
+    Notes:
+    - The function filters out groups with fewer observations than `opts.MINOBS`.
+    - If the number of unique values in `d` exceeds `opts.MAXVAL`, the function prints a warning and returns empty matrices.
+    - The function optionally computes the optimal bandwidth for KDE if `opts.scale` is set to 1.
+    - Cumulative distributions are normalized to have a maximum of 1.
+    */
+
     v = values(d)
     n_factor_values = rows(v)
     matrix f = {}
@@ -165,7 +195,7 @@ end function
 
 function bundle fdensity_series (const series x,
                                  const series d,
-                                 bundle opts)
+                                 const bundle opts)
 
     /*
     This function calculates the kernel density estimation for a given series.
@@ -209,9 +239,35 @@ end function
 function bundles fdensity (const list L,
                            const series d,
                            bundle opts[null])
-    /* code description
-    return: type, description */
+    /*
+    This function performs factor-based density estimation on multiple numeric series, optionally grouped by a factor series. It supports customization through a bundle of options and can generate plots for the estimated densities.
 
+    Parameters:
+    - L (const list): A list of numeric series for which density estimation is to be performed.
+    - d (const series): A factor series, where each unique value represents a group. Density estimation is performed separately for each group.
+    - opts (bundle, optional): A bundle containing options for density estimation and plotting. If not provided, default options are used.
+
+    Returns:
+    - bundles Ret: An array of bundles, where each bundle contains the results of density estimation for a corresponding series in `L`. The results include estimated densities, group information, and plotting data.
+
+    Detailed Description:
+    The function iterates over each series in `L`, performing density estimation grouped by the unique values in `d`. It supports various customization options through `opts`, such as bandwidth selection, plot customization, and handling of missing values. If `L` contains a single series, a direct density plot is generated. For multiple series, a grid plot combining the density plots of all series is produced.
+
+    The `opts` bundle can include options like bandwidth (`scale`), minimum observations per group (`MINOBS`), plot titles, axis labels, and more. The function automatically handles the naming of series and groups for plot legends and titles.
+
+    Example Usage:
+    - To perform density estimation on series `y` and `z` grouped by `g`, with custom bandwidth and plot titles:
+        ```
+        list L = y z
+        series g = ...
+        bundle opts = defbundle("scale", 0.5, "plot_title", "Density Estimation")
+        bundles results = fdensity(L, g, opts)
+        ```
+
+    Notes:
+    - The function is designed to be flexible and is suitable for exploratory data analysis, especially when dealing with grouped data.
+    - It automatically generates plots for visual inspection of the density estimates, which can be customized or disabled via `opts`.
+    */
     scalar nL = nelem(L)
     bundles Ret = array(nL)
     bundle self = exists(opts) ? opts : _()
@@ -243,8 +299,17 @@ end function
 
 function void gridplot_fdensity (const strings Plots,
                                  const bundle self)
-    /* code description
-    return: type, description */
+    /*
+    This function creates a grid plot from a series of plot filenames, arranging them based on the number of series analyzed in the density estimation process. It automatically adjusts the grid's dimensions to best fit the number of plots, aiming for a square-like layout to efficiently use space and maintain readability.
+
+    Parameters:
+    - Plots (const strings): A list of filenames (strings) for the plots to be included in the grid. Each filename should correspond to a plot generated from density estimation results.
+    - self (const bundle): A bundle containing configuration options for the grid plot. Expected keys include:
+        - width (scalar): The base width for each plot in the grid. The total width of the grid plot will be adjusted based on the number of plots.
+        - height (scalar): The base height for each plot in the grid. The total height of the grid plot will be adjusted similarly.
+        - nL (scalar): The number of series (or plots) that were analyzed, which determines the grid layout.
+        - dest (string): The destination filename for the generated grid plot.
+    */
     scalar width = ceil(self.width * sqrt(self.nL))
     scalar height = ceil(self.height * sqrt(self.nL))
     string dest = self.dest
