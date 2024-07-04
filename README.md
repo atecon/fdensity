@@ -9,7 +9,9 @@ Source code and test script(s) can be found here: https://github.com/atecon/fden
 
 The function signature is
 
-``` function bundle fdensity(const series x, const series d, bundle opts_in[null]) ```
+```
+function bundle fdensity(const series x, const series d, bundle opts_in[null])
+```
 
 Create kernel density estimation (KDE) plots for each series in `x`. Internally, this function uses the `kdensity()` function, and its optional parameters (bandwidth and kernel choice) can be passed via appropiate keys in the option bundle.
 
