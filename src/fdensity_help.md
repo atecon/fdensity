@@ -1,6 +1,6 @@
 # The 'fdensity' package
 
-This function computes and draws the conditional densities of `x` for each value of the discrete variable `d` (aka "factor"). Hence the package name (factorized density). This can be seen as a companion feature to `boxplot x d --factorized`. It also extends the built-in command `kdplot` and makes internally use of gretl's `kdensity()` function. The optimal bandwitdh is computed by what is known as Silverman's rule of thumb (for details see here: https://gretl.sourceforge.net/gretl-help/funcref.html#kdensity).
+This function computes and draws the conditional densities of `x` for each value of the discrete variable `d` (aka "factor"). Hence the package name (factorized density). `x` can be a series or a list (in which case a grid of KDE plots is compiled). This can be seen as a companion feature to `boxplot x d --factorized`. It also extends the built-in command `kdplot` and makes internally use of gretl's `kdensity()` function. The optimal bandwitdh is computed by what is known as Silverman's rule of thumb (for details see here: https://gretl.sourceforge.net/gretl-help/funcref.html#kdensity).
 
 _Warning_: the maximum number of different values for the factor is set to `MAXVAL = 12` (the plot would be unreadable otherwise IMO). Moreover, in order to compute the conditional density, at least `MINOBS = 30` valid observations must be available for each category. Categories that don't meet that requirement will be ignored.
 
@@ -11,11 +11,11 @@ The function signature is
 
 ``` function bundle fdensity(const series x, const series d, bundle opts_in[null]) ```
 
-Internally, this function uses the `kdensity()` function, and its optional parameters (bandwidth and kernel choice) can be passed via appropiate keys in the option bundle.
+Create kernel density estimation (KDE) plots for each series in `x`. Internally, this function uses the `kdensity()` function, and its optional parameters (bandwidth and kernel choice) can be passed via appropiate keys in the option bundle.
 
 ## Parameters
 
-- `x`:  `series`, Input series for which to compute conditional densities
+- `x`:  `list`, List of input series for which to compute conditional densities
 - `d`:  `series`, Discrete variable (numeric or string-valued) defining the `p` distinct "factors".
 
 More generally, the option bundle accepts the following keys:
@@ -60,9 +60,12 @@ The dialog box can be opened via `View -> Graph specified vars -> Factorized den
 # Changelog
 
 * **v0.7 (July 2024)**
+    * Add support for list of series in `x`. In case multiple series are passed, a grid of kde-plots is created.
     * Add new parameter `cumulative` for computing the cumulative distribution (default: FALSE)
-    * Add new parameter `grid` for showing grid (default: `TRUE`)
-    * Add new parameter `logscale` for logarithmic scale on the y-axis (logbase 10) (default: `FALSE`)
+    * Add new parameter `grid` for showing grid (default: TRUE)
+    * Add new parameter `logscale` for logarithmic scale on the y-axis (logbase 10) (default: FALSE)
+    * Increase the minimum version from 2021a to 2023c
+
 
 * **v0.6 (March 2024)**
     * Support for various plotting options
