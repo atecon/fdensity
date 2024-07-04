@@ -1,17 +1,16 @@
 set verbose off
+set seed 12041996
 include fdensity.gfn
 
-EXAMPLE = 7   # Select an example to run
+EXAMPLE = 1   # Select an example to run
 
 if EXAMPLE == 1
     # artificial, with dummy factor
-    set seed 12041996
     nulldata 8192
     d = uniform() < 0.4
     x = d ? normal() : 3 + normal()/2
     freq x --silent --plot=display
-    boxplot x d --factorized --output=display	
-
+    boxplot x d --factorized --output=display
     bundle b = fdensity(x, d)
     print "three plots should have appeared"
 
@@ -32,7 +31,6 @@ elif EXAMPLE == 3
 
 elif EXAMPLE == 4
     # same as example 1, with different options
-    set seed 12041996
     nulldata 8192
     d = uniform() < 0.4
     x = d ? normal() : 3 + normal()/2
@@ -47,7 +45,6 @@ elif EXAMPLE == 4
 
 elif EXAMPLE == 5
     # same as example 1, with different options
-    set seed 12041996
     nulldata 8192
     d = uniform() < 0.4
     x = d ? normal() : 3 + normal()/2
@@ -58,17 +55,14 @@ elif EXAMPLE == 5
     b = fdensity(x, d, opts)
     print "a plot with a restricted x-range should have appeared"
 
-
-elif EXAMPLE == 6
+elif EXAMPLE == 6  # list of variables
     # artificial, with dummy factor
-    set seed 12041996
     nulldata 8192
     d = uniform() < 0.4
-    list X = mat2list(mnormal($nobs, 7) .+ {d})
+    list X = mat2list(mnormal($nobs, 4) .+ {d})
     bundles B = fdensity(X, d)
-    #print "three plots should have appeared"
 
-elif EXAMPLE == 7
+elif EXAMPLE == 7 # list of series
     open mroz87 --quiet
     list L = WA HA WE HE
     bundles B = fdensity(L, KL6)
