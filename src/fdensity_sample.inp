@@ -11,8 +11,10 @@ if EXAMPLE == 1
     x = d ? normal() : 3 + normal()/2
     freq x --silent --plot=display
     boxplot x d --factorized --output=display
-    bundle b = fdensity(x, d)
+    bundles b = fdensity(x, d)
     print "three plots should have appeared"
+    # print content of bundle
+    print b[1]
 
 elif EXAMPLE == 2
     # discrete numerical factor
@@ -40,7 +42,7 @@ elif EXAMPLE == 4
                     linewidth = 2, grid = FALSE, cumulative = TRUE,
                     logscale = FALSE)
 
-    b = fdensity(x, d, opts)
+    fdensity(x, d, opts)
     print "a plot should have appeared"
 
 elif EXAMPLE == 5
@@ -52,7 +54,7 @@ elif EXAMPLE == 5
     opts = _(scale = 1, control = 1,
              title = my_title, add_opts = "set xrange[-2:2]")
 
-    b = fdensity(x, d, opts)
+    fdensity(x, d, opts)
     print "a plot with a restricted x-range should have appeared"
 
 elif EXAMPLE == 6  # list of variables
@@ -61,9 +63,10 @@ elif EXAMPLE == 6  # list of variables
     d = uniform() < 0.4
     list X = mat2list(mnormal($nobs, 4) .+ {d})
     bundles B = fdensity(X, d)
+    print B
 
 elif EXAMPLE == 7 # list of series
     open mroz87 --quiet
     list L = WA HA WE HE
-    bundles B = fdensity(L, KL6)
+    fdensity(L, KL6)
 endif
