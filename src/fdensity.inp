@@ -173,7 +173,7 @@ function bundle default_options (void)
                    dest = "display",
                    fontsize = 10,
                    fontsize_tics = 10,
-                   grid = TRUE,
+                   grid = FALSE,
                    linewidth = 2.0,
                    logscale = FALSE,
                    MINOBS = 30,

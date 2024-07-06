@@ -32,7 +32,7 @@ More generally, the option bundle accepts the following keys:
 - `dest`: string, destination (default = `display`)
 - `fontsize`: scalar, Size of font for title and labels (default: `10`)
 - `fontsize_tics`: scalar, Size of font tics on the y- and the x-axis (default: `10`)
-- `grid`: bool, Show grid (default = `TRUE`)
+- `grid`: bool, Show grid (default = `FALSE`)
 - `height`: scalar, Height of the plot in pixels (default = `240`)
 - `linewidth`: scalar, Width of line(s) (default: `2.0`)
 - `logscale`: bool, Logarithmic scale on the y-axis (logbase 10) (default = `FALSE`)
