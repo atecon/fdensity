@@ -387,13 +387,17 @@ end function
 
 function bundle fdensity_GUI (const series x "Input",
                               const series d "Factors",
-                              scalar scale[0::1] "Bandwidth, 1=autom.",
-                              int control[0:1:0] {"Gaussian", "Epanechnikov"})
+                              const scalar scale[0::1] "Bandwidth, 1=autom.",
+                              const int control[0:1:0] "Kernel" {"Gaussian", "Epanechnikov"},
+                              const int cumulative[0:1:0] "Type"  {"Density", "Cumulative"},
+                              const int logscale[0:1:0] "Scale" {"Linear", "Logarithmic"})
     /* Function for creating GUI dialog box. */
 
     bundle self = default_options()
     self.scalar = scale
     self.control = control
+    self.logscale = logscale
+    self.cumulative = cumulative
     self.xname = argname(x)
     self.dname = argname(d)
     self.title = sprintf("Kernel density of %s by %s", self.xname, self.dname)

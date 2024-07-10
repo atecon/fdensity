@@ -66,6 +66,7 @@ The dialog box can be opened via `View -> Graph specified vars -> Factorized den
     * Add new parameter `cumulative` for computing the cumulative distribution (default: FALSE)
     * Add new parameter `grid` for showing grid (default: TRUE)
     * Add new parameter `logscale` for logarithmic scale on the y-axis (logbase 10) (default: FALSE)
+    * Add GUI control parameters `logscale` and `cumulative`
     * Increase the minimum version from 2021a to 2023c
     * Internal refactoring
 
