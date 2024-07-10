@@ -433,8 +433,8 @@ end function
 
 function scalar kde_bandwidth (matrix input,
                                string method,
-                               const int skip_na[0:1:1],
-                               const int verbose[0:1:0])
+                               const bool skip_na[0:1:1],
+                               const bool verbose[0:1:0])
     /*
        Calculate the bandwidth for kernel density estimation (KDE) using
        various methods for uni-variate data only (at the moment).
@@ -480,7 +480,7 @@ end function
 
 
 function void bandwidth_print (const string method,
-                               const int skip_na[0:1:1],
+                               const bool skip_na[0:1:1],
                                const scalar bandwidth)
     /* Print out results. */
 
