@@ -1,7 +1,7 @@
 author = Artur Tarassow and Riccardo "Jack" Lucchetti
 email = atecon@posteo.de
 version = 0.7
-date = 2024-07-06
+date = 2024-07-10
 description = Factorized kernel density estimation
 tags = C14
 min-version = 2023c
