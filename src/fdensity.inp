@@ -394,7 +394,7 @@ function bundle fdensity_GUI (const series x "Input",
     /* Function for creating GUI dialog box. */
 
     bundle self = default_options()
-    self.scalar = scale
+    self.scale = scale
     self.control = control
     self.logscale = logscale
     self.cumulative = cumulative
