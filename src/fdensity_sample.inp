@@ -52,7 +52,7 @@ elif EXAMPLE == 5
     x = d ? normal() : 3 + normal()/2
     my_title = "Automatic bandwidth and Epanechnikov kernel"
     opts = _(scale = 1, control = 1,
-             title = my_title, add_opts = "set xrange[-2:2]")
+             title = my_title, add_opts = "set xrange[-2:4]")
 
     fdensity(x, d, opts)
     print "a plot with a restricted x-range should have appeared"
