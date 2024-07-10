@@ -66,8 +66,8 @@ function matrices fkd (const series x,
     - Cumulative distributions are normalized to have a maximum of 1.
     */
 
-    v = values(d)
-    n_factor_values = rows(v)
+    d_values = values(d)
+    n_factor_values = rows(d_values)
     matrix f = {}
     matrix kept = {}
 
@@ -81,8 +81,7 @@ function matrices fkd (const series x,
     matrix Y = {}
 
     loop i = 1..n_factor_values
-        di = v[i]
-        series tmp = d == di ? x : NA
+        series tmp = d == d_values[i] ? x : NA
         nn = nobs(tmp)
 
         if nn >= opts.MINOBS
@@ -108,7 +107,7 @@ function matrices fkd (const series x,
 
             Y |= Yi
         else
-            printf "WARNING: Too few observations for %s = %d (n=%d but n*=%d obs. are at least required).\nIgnore.\n", opts.dname, di, nn, opts.MINOBS
+            printf "WARNING: Too few observations for %s = %d (n=%d but %d obs. are at least required).\nIgnore.\n", opts.dname, d_values[i], nn, opts.MINOBS
         endif
     endloop
     nk = nelem(kept)
