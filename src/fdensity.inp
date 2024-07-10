@@ -107,6 +107,8 @@ function matrices fkd (const series x,
             endif
 
             Y |= Yi
+        else
+            printf "WARNING: Too few observations for %s = %d (n=%d but n*=%d obs. are at least required).\nIgnore.\n", opts.dname, di, nn, opts.MINOBS
         endif
     endloop
     nk = nelem(kept)
@@ -398,16 +400,15 @@ function bundle fdensity_GUI (const series x "Input",
     self.title = sprintf("Kernel density of %s by %s", self.xname, self.dname)
 
     matrices f_k = fkd(x, d, self)
-    matrix kept = f_k[2]
     scalar self.err = FALSE
 
-    if nelem(kept) == 0
-        funcerr "Invalid conditioning"
+    if nelem(f_k[2]) == 0
+        print "ERROR: Invalid conditioning."
         self.err = TRUE
         return self
     endif
 
-    self.kept = kept
+    self.kept = f_k[2]
     matrix self.f = f_k[1]
     matrix f = self.f  # for plotting only
 
