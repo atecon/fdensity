@@ -60,6 +60,7 @@ The dialog box can be opened via `View -> Graph specified vars -> Factorized den
 
 
 # Changelog
+
 * **v0.8 (February 2025)**
     * Add support for plotting densities of multiple series in a grid without the need to pass a factor series. The factor series is now optional.
     * Increase default values for `width` and `height` to 640 and 480, respectively.
