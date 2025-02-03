@@ -105,6 +105,7 @@ function matrices kdensity_factorized (const series x,
     d_values = values(d)
     n_factor_values = rows(d_values)
     strings factor_strings = strvals(d, TRUE)
+    factor_strings = nelem(factor_strings) ? factor_strings : array(n_factor_values)
     matrix f = {}
     matrix kept = {}
 
@@ -166,7 +167,7 @@ function matrices kdensity_factorized (const series x,
 
         # set up the column names
         f = Z ~ X
-        if nelem(factor_strings)
+        if nelem(strvals(d, TRUE))
             strings clabels = factor_strings[kept]
         else
             matrix v = values(d)
