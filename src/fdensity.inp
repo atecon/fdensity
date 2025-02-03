@@ -305,7 +305,7 @@ function bundles fdensity (const list L,
     if self.nL == 1
         self.xname = Lnames[1]
         Ret[1] = fdensity_series(L[1], factor, self)
-        plot_fdensity(Ret[1], self)
+        plot_fdensity(Ret[1].f, self)
     endif
 
     gpbuild Plots
@@ -314,7 +314,7 @@ function bundles fdensity (const list L,
             Ret[i] = fdensity_series(L[i], factor, self)
 
             self.nokey = i == 2 ? TRUE : self.nokey
-            plot_fdensity(Ret[i], self)
+            plot_fdensity(Ret[i].f, self)
         endloop
     end gpbuild
 
@@ -347,7 +347,7 @@ function void gridplot_fdensity (const strings Plots,
 end function
 
 
-function void plot_fdensity (const bundle input,
+function void plot_fdensity (const matrix fdata,
                              const bundle opts)
 
     /*
@@ -356,20 +356,15 @@ function void plot_fdensity (const bundle input,
     * Plots the density function using the given input data and options.
     *
     * Parameters:
-    *    input - A bundle containing the input data.
+    *    fdata - A matrix including the density function data.
     *    opts - A bundle containing the plot options.
     *
     * Returns:
     *    None
     */
 
-    matrix fdata = input.f
     string dest = opts.dest
-    if nelem(opts.factor_name)
-        string title = sprintf("Kernel density of %s by %s", opts.xname, opts.factor_name)
-    else
-        string title = sprintf("Kernel density of %s", opts.xname)
-    endif
+    string title = get_subplot_title(opts.xname, opts.factor_name)
 
     string plot_options = opts.auto_pointtype == TRUE ? "with-lp " : \
                           "with-lines "
@@ -412,9 +407,21 @@ function void plot_fdensity (const bundle input,
 end function
 
 
+function string get_subplot_title (const string xname, const string factor_name)
+    /* Generate the title for the subplot based on the input series and factor name. */
+
+    if nelem(factor_name)
+        string title = sprintf("Kernel density of %s by %s", xname, factor_name)
+    else
+        string title = sprintf("Kernel density of %s", xname)
+    endif
+
+    return title
+end function
+
 
 function bundle fdensity_GUI (const series x "Input",
-                              const series d "Factors",
+                              const series factor[null] "Factors (optional)",
                               const scalar scale[0::1] "Bandwidth, 1=autom.",
                               const int control[0:1:0] "Kernel" {"Gaussian", "Epanechnikov"},
                               const int cumulative[0:1:0] "Type"  {"Density", "Cumulative"},
@@ -427,10 +434,16 @@ function bundle fdensity_GUI (const series x "Input",
     self.logscale = logscale
     self.cumulative = cumulative
     self.xname = argname(x)
-    self.factor_name = argname(d)
-    self.title = sprintf("Kernel density of %s by %s", self.xname, self.factor_name)
+    string self.factor_name = exists(factor) ? argname(factor) : ""
+    string title = get_subplot_title(self.xname, self.factor_name)
 
-    matrices f_k = kdensity_factorized(x, d, self)
+    if !exists(factor)
+        matrix self.f = kdensity_no_factor(x, self)
+        plot_fdensity(self.f, self)
+        return self
+    endif
+
+    matrices f_k = kdensity_factorized(x, factor, self)
     scalar self.err = FALSE
 
     if nelem(f_k[2]) == 0
@@ -441,9 +454,8 @@ function bundle fdensity_GUI (const series x "Input",
 
     self.kept = f_k[2]
     matrix self.f = f_k[1]
-    matrix f = self.f  # for plotting only
 
-    plot_fdensity(self, self)
+    plot_fdensity(self.f, self)
 
     return self
 end function
