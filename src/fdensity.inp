@@ -53,6 +53,22 @@ function matrix kdensity_no_factor (const series x,
 end function
 
 
+function void print_warn_too_few_factor_obs (const string factor_string,
+                                             const int d_value,
+                                             const int nn,
+                                             const int MINOBS)
+    /* Print a warning message for too few observations in a factor group. */
+
+    if nelem(factor_string)
+        printf "WARNING: Too few observations for category '%s' (n=%d but %d obs. are at least required).\nIgnore.\n",
+        factor_string, nn, MINOBS
+    else
+        printf "WARNING: Too few observations for category id '%d' (n=%d but %d obs. are at least required).\nIgnore.\n",
+        d_value, nn, MINOBS
+    endif
+end function
+
+
 function matrices kdensity_factorized (const series x,
                                        const series d,
                                        bundle opts)
@@ -88,6 +104,7 @@ function matrices kdensity_factorized (const series x,
 
     d_values = values(d)
     n_factor_values = rows(d_values)
+    strings factor_strings = strvals(d, TRUE)
     matrix f = {}
     matrix kept = {}
 
@@ -128,9 +145,10 @@ function matrices kdensity_factorized (const series x,
 
             Y |= Yi
         else
-            printf "WARNING: Too few observations for %s = %d (n=%d but %d obs. are at least required).\nIgnore.\n", opts.factor_name, d_values[i], nn, opts.MINOBS
+            print_warn_too_few_factor_obs(factor_strings[i], d_values[i], nn, opts.MINOBS)
         endif
     endloop
+
     nk = nelem(kept)
 
     if nk > 0
@@ -148,9 +166,8 @@ function matrices kdensity_factorized (const series x,
 
         # set up the column names
         f = Z ~ X
-        strs = strvals(d, 1)
-        if nelem(strs)
-            strings clabels = strs[kept]
+        if nelem(factor_strings)
+            strings clabels = factor_strings[kept]
         else
             matrix v = values(d)
             strings clabels = array(nk)
