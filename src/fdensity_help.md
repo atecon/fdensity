@@ -33,7 +33,7 @@ More generally, the option bundle accepts the following keys:
 - `fontsize`: scalar, Size of font for title and labels (default: `10`)
 - `fontsize_tics`: scalar, Size of font tics on the y- and the x-axis (default: `10`)
 - `grid`: bool, Show grid (default = `FALSE`)
-- `height`: scalar, Height of the plot in pixels (default = `240`)
+- `height`: scalar, Height of the plot in pixels (default = `480`)
 - `linewidth`: scalar, Width of line(s) (default: `2.0`)
 - `logscale`: bool, Logarithmic scale on the y-axis (logbase 10) (default = `FALSE`)
 - `monochrome`: bool, Lines are coloured black (default = `FALSE`)
@@ -42,7 +42,7 @@ More generally, the option bundle accepts the following keys:
 - `scale`: as in gretl's built-in function `kdensity()`: bandwidth adjustment factor; By default this value is `1` and the optimal bandwidth is computed by Silverman's method.
 - `single_y_axis`: bool, Enforce single y-axis (default = `FALSE`)
 - `title`: string, plot title (default = "")
-- `width`: scalar, Width of the plot in pixels (default = 320)
+- `width`: scalar, Width of the plot in pixels (default = `640`)
 - `ylabel`: string, label at the y-axis (default = "")
 - `xlabel`: string, label at the x-axis (default = "")
 
@@ -62,6 +62,7 @@ The dialog box can be opened via `View -> Graph specified vars -> Factorized den
 # Changelog
 * **v0.8 (February 2025)**
     * Add support for plotting densities of multiple series in a grid without the need to pass a factor series. The factor series is now optional.
+    * Increase default values for `width` and `height` to 640 and 480, respectively.
     * Bugfix: The optimal `scale` was only computed for the first series in the list of series. Now it is computed for each series.
     * Bugfix: Parameter `title` was used as the title for each subplot in the grid. Now it is used as the title for the whole plot.
     * Internal refactoring, mainly renaming of variables
