@@ -69,6 +69,9 @@ elif EXAMPLE == 6  # list of variables
     bundles B = fdensity(X, d)
     print B
 
+    # Now without factors
+    fdensity(X)
+
 elif EXAMPLE == 7 # list of series
     open mroz87 --quiet
     list L = WA HA WE HE
