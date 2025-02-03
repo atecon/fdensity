@@ -29,10 +29,10 @@ elif EXAMPLE == 2
 elif EXAMPLE == 3
     # same as above, with string-valued factor
     open keane.gdt --quiet
-    series str_ch = choice
-    stringify(str_ch, strsplit("sch home wc bc serv"))
+    series factor_series = choice
+    stringify(factor_series, strsplit("sch home wc bc serv"))
 
-    fdensity(lwage, str_ch)
+    fdensity(lwage, factor_series)
     print "a plot should have appeared"
 
 elif EXAMPLE == 4
