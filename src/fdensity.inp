@@ -33,11 +33,32 @@ function matrix fill (const matrix f,
     return ret
 end function
 
-function matrices fkd (const series x,
-                       const series d,
-                       bundle opts)
+
+function matrix kdensity_no_factor (const series x,
+                                    bundle opts)
+    /* This function performance density estimation (KDE) for a given numeric series `x` without grouping by a factor.
+    The returned matrix has 2 columns. The first holds the estimated density at each of evenly spaced points (second column) along the x-axis. */
+
+    matrix kd = kdensity(x, opts.scale, opts.control)
+
+    if opts.cumulative
+        print "a"
+        kd[,2] = cum(kd[,2])
+        kd[,2] = kd[,2] ./ max(kd[,2])
+    endif
+
+    # Only relevant for plotting
+    kd = mreverse(kd, TRUE)
+
+    return kd
+end function
+
+
+function matrices kdensity_factorized (const series x,
+                                       const series d,
+                                       bundle opts)
     /*
-    fkd: Factor-based Kernel Density Estimation
+    kdensity_factorized: Factor-based Kernel Density Estimation
 
     This function performs kernel density estimation (KDE) for a given numeric series `x`,
     grouped by the factor values in series `d`, and according to options specified in `opts`.
@@ -51,7 +72,7 @@ function matrices fkd (const series x,
         - scale (scalar): The bandwidth to use for KDE. If `opts.scale` is 1, the optimal bandwidth is computed.
         - control (scalar): Additional control parameter for KDE.
         - cumulative (bool): If true, computes the cumulative distribution function instead of the density.
-        - dname (string): The name of the factor series `d`.
+        - factor_name (string): The name of the factor series `d`.
         - xname (string): The name of the numeric series `x`.
 
     Returns:
@@ -107,7 +128,7 @@ function matrices fkd (const series x,
 
             Y |= Yi
         else
-            printf "WARNING: Too few observations for %s = %d (n=%d but %d obs. are at least required).\nIgnore.\n", opts.dname, d_values[i], nn, opts.MINOBS
+            printf "WARNING: Too few observations for %s = %d (n=%d but %d obs. are at least required).\nIgnore.\n", opts.factor_name, d_values[i], nn, opts.MINOBS
         endif
     endloop
     nk = nelem(kept)
@@ -134,7 +155,7 @@ function matrices fkd (const series x,
             matrix v = values(d)
             strings clabels = array(nk)
             loop i = 1..nk
-                clabels[i] = sprintf("%s = %d", opts.dname, v[kept[i]])
+                clabels[i] = sprintf("%s = %d", opts.factor_name, v[kept[i]])
             endloop
         endif
         clabels = clabels + defarray(opts.xname)
@@ -195,14 +216,14 @@ end function
 
 
 function bundle fdensity_series (const series x,
-                                 const series d,
+                                 const series factor[null],
                                  const bundle opts)
 
     /*
     This function calculates the kernel density estimation for a given series.
     Parameters:
       - x: The series for which the kernel density is calculated.
-      - d: The conditioning series.
+      - factor: The conditioning series.
       - opts: Bundle of options for the kernel density estimation.
     Returns:
       A bundle containing the kernel density estimation results and options.
@@ -213,15 +234,21 @@ function bundle fdensity_series (const series x,
     if strlen(opts.xname) == 0
         opts.xname = "(anonymous)"
     endif
-    if strlen(opts.dname) == 0
-        opts.dname = "(anonymous)"
+    if strlen(opts.factor_name) == 0
+        opts.factor_name = "(anonymous)"
     endif
     */
 
-    matrices f_k = fkd(x, d, opts)
-    kept = f_k[2]
     bundle ret = opts
-    ret.err = 0
+    scalar ret.err = FALSE
+
+    if !exists(factor)
+        matrix ret.f = kdensity_no_factor(x, opts)
+        return ret
+    endif
+
+    matrices f_k = kdensity_factorized(x, factor, opts)
+    kept = f_k[2]
 
     if nelem(kept) == 0
         printf "Invalid conditioning\n"
@@ -238,14 +265,14 @@ end function
 
 
 function bundles fdensity (const list L,
-                           const series d,
+                           const series factor[null],
                            bundle opts[null])
     /*
     This function performs factor-based density estimation on multiple numeric series, optionally grouped by a factor series. It supports customization through a bundle of options and can generate plots for the estimated densities.
 
     Parameters:
     - L (const list): A list of numeric series for which density estimation is to be performed.
-    - d (const series): A factor series, where each unique value represents a group. Density estimation is performed separately for each group.
+    - factor (const series, optional): An optional factor series, where each unique value represents a group. Density estimation is performed separately for each group.
     - opts (bundle, optional): A bundle containing options for density estimation and plotting. If not provided, default options are used.
 
     Returns:
@@ -269,31 +296,32 @@ function bundles fdensity (const list L,
     - The function is designed to be flexible and is suitable for exploratory data analysis, especially when dealing with grouped data.
     - It automatically generates plots for visual inspection of the density estimates, which can be customized or disabled via `opts`.
     */
-    scalar nL = nelem(L)
-    bundles Ret = array(nL)
+
     bundle self = exists(opts) ? opts : _()
     self = self + default_options()
-    strings xnames = varnames(L)
-    string self.dname = argname(d)
-    self.nL = nL
+    scalar self.nL = nelem(L)
+    bundles Ret = array(self.nL)
+    strings Lnames = varnames(L)
+    string self.factor_name = exists(factor) ? argname(factor) : ""
 
     if self.nL == 1
-        self.xname = xnames[1]
-        Ret[1] = fdensity_series(L[1], d, self)
+        self.xname = Lnames[1]
+        Ret[1] = fdensity_series(L[1], factor, self)
         plot_fdensity(Ret[1], self)
-    else
-        gpbuild Plots
-            loop i = 1..self.nL
-                self.xname = xnames[i]
-                Ret[i] = fdensity_series(L[i], d, self)
-
-                self.nokey = i == 2 ? TRUE : self.nokey
-                plot_fdensity(Ret[i], self)
-            endloop
-        end gpbuild
-
-        gridplot_fdensity(Plots, self)
     endif
+
+    gpbuild Plots
+        loop i = 1..self.nL
+            self.xname = Lnames[i]
+            Ret[i] = fdensity_series(L[i], factor, self)
+
+            self.nokey = i == 2 ? TRUE : self.nokey
+            plot_fdensity(Ret[i], self)
+        endloop
+    end gpbuild
+
+    gridplot_fdensity(Plots, self)
+
 
     return Ret
 end function
@@ -342,12 +370,13 @@ function void plot_fdensity (const bundle input,
     if strlen(opts.title)
         title = opts.title
     else
-        title = sprintf("Kernel density of %s by %s", opts.xname, opts.dname)
+        title = sprintf("Kernel density of %s by %s", opts.xname, opts.factor_name)
     endif
 
     string plot_options = opts.auto_pointtype == TRUE ? "with-lp " : \
-                         "with-lines "
+                          "with-lines "
     plot_options += opts.single_yaxis == TRUE ? "single-yaxis " : ""
+    plot_options += " fit=none"
 
     string linetype_options = ""
     if opts.auto_dashtype || opts.auto_pointtype || opts.monochrome
@@ -368,7 +397,7 @@ function void plot_fdensity (const bundle input,
     string logscale_opts = opts.logscale == TRUE ? "set logscale y 10" : ""
 
     plot fdata
-        option @plot_options
+        options @plot_options
         printf "%s", linetype_options
         printf "set termoption lw %d", opts.linewidth
         printf "set title \"%s\" font ',%d'", title, opts.fontsize
@@ -399,10 +428,10 @@ function bundle fdensity_GUI (const series x "Input",
     self.logscale = logscale
     self.cumulative = cumulative
     self.xname = argname(x)
-    self.dname = argname(d)
-    self.title = sprintf("Kernel density of %s by %s", self.xname, self.dname)
+    self.factor_name = argname(d)
+    self.title = sprintf("Kernel density of %s by %s", self.xname, self.factor_name)
 
-    matrices f_k = fkd(x, d, self)
+    matrices f_k = kdensity_factorized(x, d, self)
     scalar self.err = FALSE
 
     if nelem(f_k[2]) == 0
