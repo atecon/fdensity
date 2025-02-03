@@ -22,6 +22,10 @@ elif EXAMPLE == 2
     fdensity(lwage, choice)
     print "a plot should have appeared"
 
+    # Without factor series
+    fdensity(lwage)
+    print "a plot should have appeared"
+
 elif EXAMPLE == 3
     # same as above, with string-valued factor
     open keane.gdt --quiet
