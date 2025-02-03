@@ -42,7 +42,6 @@ function matrix kdensity_no_factor (const series x,
     matrix kd = kdensity(x, opts.scale, opts.control)
 
     if opts.cumulative
-        print "a"
         kd[,2] = cum(kd[,2])
         kd[,2] = kd[,2] ./ max(kd[,2])
     endif
