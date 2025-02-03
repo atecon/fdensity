@@ -1,6 +1,6 @@
 # The 'fdensity' package
 
-This function computes and draws the conditional densities of `x` for each value of the discrete variable `d` (aka "factor"). Hence the package name (factorized density). `x` can be a series or a list (in which case a grid of KDE plots is compiled). This can be seen as a companion feature to `boxplot x d --factorized`. It also extends the built-in command `kdplot` and makes internally use of gretl's `kdensity()` function. The optimal bandwitdh is computed by what is known as Silverman's rule of thumb (for details see here: https://gretl.sourceforge.net/gretl-help/funcref.html#kdensity).
+This function computes and draws the conditional densities of `x`. Optionally, the densities can be computed for each value of the discrete variable `d` (aka "factor"). Hence the package name (factorized density). `x` can be a series or a list (in which case a grid of KDE plots is compiled). This can be seen as a companion feature to `boxplot x d --factorized`. It also extends the built-in command `kdplot` and makes internally use of gretl's `kdensity()` function. The optimal bandwidth is computed by what is known as Silverman's rule of thumb (for details see here: https://gretl.sourceforge.net/gretl-help/funcref.html#kdensity).
 
 _Warning_: the maximum number of different values for the factor is set to `MAXVAL = 12` (the plot would be unreadable otherwise IMO). Moreover, in order to compute the conditional density, at least `MINOBS = 30` valid observations must be available for each category. Categories that don't meet that requirement will be ignored.
 
@@ -10,15 +10,15 @@ Source code and test script(s) can be found here: https://github.com/atecon/fden
 The function signature is
 
 ```
-function bundle fdensity(const series x, const series d, bundle opts_in[null])
+function bundle fdensity(series x, series factor[null], bundle opts_in[null])
 ```
 
-Create kernel density estimation (KDE) plots for each series in `x`. Internally, this function uses the `kdensity()` function, and its optional parameters (bandwidth and kernel choice) can be passed via appropiate keys in the option bundle.
+Create kernel density estimation (KDE) plots for each series in `x` -- optionally factorized by `factor`. Internally, this function uses the `kdensity()` function, and its optional parameters (bandwidth and kernel choice) can be passed via appropriate keys in the option bundle.
 
 ## Parameters
 
 - `x`:  `list`, List of input series for which to compute conditional densities
-- `d`:  `series`, Discrete variable (numeric or string-valued) defining the `p` distinct "factors".
+- `factor`:  `series`, Discrete variable (numeric or string-valued) defining the `p` distinct "factors" (optional).
 
 More generally, the option bundle accepts the following keys:
 
@@ -50,8 +50,8 @@ The returned bundle has the same keys as the option bundle, plus
 
 - `err`: an error code which is `0` in case of no error, otherwise `1`.
 - `f`: a matrix with `p+1` columns. The first `p` columns hold the estimated density or densities at each of these points and the `p+1`-th column holds a set of evenly spaced abscissae.
-- `kept`: a vector holding the distinct values of the factors (from input series `f`) actually used for computing the densities. (Others may have been skipped due to insufficient number of observations.)
-- `scale`: scalar value holding the optimal bandwitdh if the original value of `scale` is `1` in which case the optimal bandwidth gets computed.
+- `kept`: a vector holding the distinct values of the factors (from input series `f`) actually used for computing the densities. (Others may have been skipped due to insufficient number of observations. ONLY if `factor` is not `null`.)
+- `scale`: scalar value holding the optimal bandwidth if the original value of `scale` is `1` in which case the optimal bandwidth gets computed.
 
 
 ## GUI access
@@ -60,6 +60,11 @@ The dialog box can be opened via `View -> Graph specified vars -> Factorized den
 
 
 # Changelog
+* **v0.8 (February 2025)**
+    * Add support for plotting densities of multiple series in a grid without the need to pass a factor series. The factor series is now optional.
+    * Bugfix: The optimal `scale` was only computed for the first series in the list of series. Now it is computed for each series.
+    * Bugfix: Parameter `title` was used as the title for each subplot in the grid. Now it is used as the title for the whole plot.
+    * Internal refactoring, mainly renaming of variables
 
 * **v0.7 (July 2024)**
     * Add support for list of series in `x`. In case multiple series are passed, a grid of kde-plots is created.
@@ -69,7 +74,6 @@ The dialog box can be opened via `View -> Graph specified vars -> Factorized den
     * Add GUI control parameters `logscale` and `cumulative`
     * Increase the minimum version from 2021a to 2023c
     * Internal refactoring
-
 
 * **v0.6 (March 2024)**
     * Support for various plotting options
