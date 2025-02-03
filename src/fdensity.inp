@@ -110,6 +110,8 @@ function matrices kdensity_factorized (const series x,
             if opts.scale == 1
                 # overwrite original scale parameter
                 scalar opts.scale_optimal = optimal_bandwidth(tmp, opts)
+            else
+                scalar opts.scale_optimal = opts.scale
             endif
 
             matrix kd = kdensity(tmp, opts.scale_optimal, opts.control)
@@ -204,8 +206,8 @@ function bundle default_options (void)
                    scale = 1,
                    single_yaxis = FALSE,
                    title = "",
-                   width = 320,
-                   height = 240,
+                   width = 640,
+                   height = 480,
                    ylabel = "",
                    xlabel = "")
 
@@ -374,7 +376,7 @@ function void plot_fdensity (const matrix fdata,
     string linetype_options = ""
     if opts.auto_dashtype || opts.auto_pointtype || opts.monochrome
         string linetype_options = sprintf("set for [i=1:8] linetype i ")
-
+        linetype_options += sprintf("linewidth %d ", opts.linewidth)
         if opts.auto_dashtype
             linetype_options += "dashtype i "
         endif
@@ -393,7 +395,6 @@ function void plot_fdensity (const matrix fdata,
     plot fdata
         options @plot_options
         printf "%s", linetype_options
-        printf "set termoption linewidth %d", opts.linewidth
         printf "set title \"%s\" font ',%d'", title, opts.fontsize
         printf "set ylabel \"%s\" font ',%d'", opts.ylabel, opts.fontsize
         printf "set xlabel \"%s\" font ',%d'", opts.xlabel, opts.fontsize
@@ -403,7 +404,7 @@ function void plot_fdensity (const matrix fdata,
         printf "%s", grid_opts
         printf "%s", opts.add_opts
         printf "%s", logscale_opts
-    end plot --output="@dest"
+    end plot
 end function
 
 
