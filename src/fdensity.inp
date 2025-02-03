@@ -108,13 +108,12 @@ function matrices kdensity_factorized (const series x,
         if nn >= opts.MINOBS
             kept ~= i
 
-            # TODO: We may want to store the optimal bandwidths
             if opts.scale == 1
                 # overwrite original scale parameter
-                scalar opts.scale = optimal_bandwidth(tmp, opts)
+                scalar opts.scale_optimal = optimal_bandwidth(tmp, opts)
             endif
 
-            matrix kd = kdensity(tmp, opts.scale, opts.control)
+            matrix kd = kdensity(tmp, opts.scale_optimal, opts.control)
 
             n = rows(kd)
             X |= kd[,1]
